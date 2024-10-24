@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <link rel="stylesheet" href="register-style.css">
+</head>
+<script src="https://kit.fontawesome.com/f23b29d479.js"  crossorigin="anonymous"></script>
+<body>
+    <div class="container">
+        <p id="success" style="color: white; font-size: 2rem; text-align: center; padding-top: 20px;"></p>
+        <div class="form-box">
+            <h1>Register</h1>
+            <form action="">
+                <div class="input-group">
+                    <div class="input-field" id="nameField">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" placeholder="Userame" id="username">
+                    </div>
+                </div><div class="input-group">
+                    <p id="errorMsg" style="color: red;"></p>
+                    <div class="input-field" id="emailField">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" placeholder="Email" id="email">
+                    </div>
+                </div>
+                <div class="input-group" id="pwField">
+                    <div class="input-field">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" placeholder="Password" id="pw">
+                    </div>
+                    <div class="btn-field">
+                        <button type="button" id="registerBtn" onclick=" return register()">Register</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+function register(){
+    document.getElementById('errorMsg').innerHTML = "";
+
+    let nameField=document.getElementById('username').value;
+        let emailField=document.getElementById('email').value;
+        let pwField=document.getElementById('pw').value;
+    if(nameField=='' && emailField=='' && pwField==''){
+            alert('Please fill in all the fields.');
+            return false;
+        }
+        else if(emailField.indexOf('@')===-1){
+            document.getElementById('errorMsg').innerHTML="Email must contain '@'";
+            return false;
+        }
+        else if(emailField.indexOf('@')==0){
+            document.getElementById('errorMsg').innerHTML="Incorrect '@' position! Input Email correctly."
+            return false;
+        }
+        else if(emailField.charAt(emailField.length-4)!='.'){
+            document.getElementById('errorMsg').innerHTML="Invalid Email! Input correct Email";
+            return false;
+        }
+        
+document.getElementById('success').innerHTML="Registration Successful.";
+return true;
+}
+  </script>
+
+
+</body>
+</html>

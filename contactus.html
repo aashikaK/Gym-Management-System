@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/f23b29d479.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <section class="header">
+
+        <div class="left">
+            <!--For logo and title-->
+    <h1 class="title">
+        <img class="logo" src="images/logo.jpg" alt="this is gym logo. ">
+        ShapeShifter Fitness and Gym
+    </h1>
+  
+</div>
+
+<div class="nav-bar">
+    <a href="./home.html">Home</a>
+    <a href="./about.html">About</a>
+    <a href="./services.html">Services</a>
+    <!-- <a href="">Purpose</a> -->
+    <a href="./register.html" target="_blank">Register</a>
+    <a href="./add-facilities.html">Additional Facilities</a>
+    <a href="#contact-us-page">Contact Us</a>
+</div>
+
+<div class="right">
+    <form class="search" method="post">
+      
+        <input type="search" name="query" placeholder="Search..." aria-label="Search">
+        <button type="submit">
+            <i class="fa fa-search" aria-hidden="true"></i> <!-- Search icon inside the button -->
+        </button> <br>
+       </div>
+ </section>
+
+
+ <!-- Contact Us Section -->
+
+    <section class="contact-us-page" id="contact-us-page">
+        
+        <div class="contact-us-container">
+        <div class="contact-us-page">
+        <h1 class="contact-title-page">Contact Us</h1>
+        <p class="contact-description">If you have any questions, feel free to reach out to us!</p>
+
+        <!-- Contact Information -->
+        <div class="contact-info-page">
+            <p><i class="fas fa-phone-alt"></i> +123-456-7890</p>
+            <p><i class="fas fa-envelope"></i> <a href="mailto:shapeshiftergym@gmail.com">shapeshiftergymemail@example.com</a></p>
+            <p><i class="fab fa-instagram"></i> <a href="https://instagram.com" target="_blank">@yourgym</a></p>
+            <p><i class="fab fa-facebook"></i> <a href="https://facebook.com" target="_blank">facebook.com/yourgym</a></p>
+        </div>
+        </div>
+        <!-- Message Form --> 
+         <div class="cuform">
+            <p >You can also send message to us: </p>
+        <form class="contact-form" action="send_email.php" method="POST">
+            <label for="name">Your Name:</label>
+            <input type="text" id="name" name="name" class="contact-input" required>
+
+            <label for="email">Your Email:</label>
+            <input type="email" id="email" name="email" class="contact-input" required>
+
+            <label for="message">Your Message:</label>
+            <textarea id="message" name="message" rows="4" class="contact-textarea" required></textarea>
+
+            <button type="submit" class="contact-button">Send Message</button>
+        </form>
+    </div>
+</div>
+    </section>
+
+    <footer class="contact-footer">
+        <p>&copy; 2024 ShapeShifter Fitness and Gym. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>

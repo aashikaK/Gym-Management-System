@@ -1,0 +1,122 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+body {
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.container {
+    background-color: white;
+    width: 350px;
+    padding: 20px 40px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+.form-content header {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.field {
+    margin-bottom: 20px;
+    position: relative;
+}
+.field input {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+.field input:focus {
+    border-color: #4a90e2;
+}
+.icon-a {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+.link {
+    text-align: right;
+    margin-bottom: 20px;
+}
+.forget {
+    font-size: 14px;
+    color: #4a90e2;
+    text-decoration: none;
+}
+.forget:hover {
+    text-decoration: underline;
+}
+.button {
+    text-align: center;
+}
+.button button {
+    width: 100%;
+    padding: 10px 15px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.button button:hover {
+    background-color: #494f54;
+}
+.line {
+    height: 1px;
+    background-color: #838383;
+    margin: 20px 0;
+}
+.line::before {
+    content: 'Or';
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgb(242, 246, 246);
+    color: rgb(37, 22, 13);
+    padding: 0 15px;
+}
+.icon {
+    text-align: center;
+}
+.google {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+.google:hover {
+    background-color: #cdc2c2;
+}
+.google-img {
+    width: 20px;
+    height: 20px;
+   margin-right:10px;
+}
+/* Responsive Design */
+@media (max-width: 400px) {
+    .container {
+        width: 90%;
+        padding: 20px;
+    }
+}
