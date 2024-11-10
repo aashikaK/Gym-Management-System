@@ -1,0 +1,279 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Body Styling */
+body {
+    background-color: #121212;
+    color: #f5f5f5;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* Header Section */
+.header {
+    display: flex;
+    justify-content:space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: #1f1f1f;
+    border-bottom: 2px solid #333;
+}
+
+.header .title {
+    display: flex;
+    align-items: center;
+}
+
+.header .logo {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+.nav-bar a {
+    color: #f5f5f5;
+    margin-right: 20px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.nav-bar a:hover {
+    color: #4caf50;
+}
+
+.right .search {
+    display: flex;
+    align-items: center;
+}
+
+.search input[type="search"] {
+    padding: 5px 10px;
+    background-color: #333;
+    border: 1px solid #444;
+    color: #f5f5f5;
+    border-radius: 4px;
+    margin-right: 5px;
+}
+
+.search button {
+    background: #4caf50;
+    color: #fff;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.search button:hover {
+    background: #66bb6a;
+}
+
+/* Dashboard Sections */
+.dashboard-overview, .dashboard-section {
+    padding: 30px;
+    background-color: #1c1c1c;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dashboard-overview h2,
+.dashboard-section h2 {
+    color: #4caf50;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.stat-item {
+    background-color: #333;
+    padding: 20px;
+    border-radius: 8px;
+    width: 23%;
+    text-align: center;
+}
+
+.stat-item h3 {
+    color: #66bb6a;
+    margin-bottom: 10px;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin: 5px;
+}
+
+.cta-button:hover {
+    background-color: #66bb6a;
+}
+
+/* Profile Section */
+.profile-details p {
+    margin: 10px 0;
+}
+
+/* Footer Section */
+.footer {
+    padding: 20px;
+    background-color: #1f1f1f;
+    text-align: center;
+    color: #777;
+}
+
+.footer .social-media a {
+    color: #f5f5f5;
+    margin: 0 10px;
+    font-size: 18px;
+    transition: color 0.3s;
+}
+
+.footer .social-media a:hover {
+    color: #4caf50;
+}
+
+/* Logout Button */
+.logout {
+    background-color: #ff5252;
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.logout:hover {
+    background-color: #ff1744;
+}
+/* Payment Section */
+.payment-section {
+    padding: 30px;
+    background-color: #1c1c1c;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+    color: #f5f5f5;
+}
+
+.payment-section h2 {
+    color: #4caf50;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.payment-details {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #333;
+    border-radius: 8px;
+    color: #f5f5f5;
+}
+
+.payment-details p {
+    margin: 10px 0;
+    font-size: 16px;
+    color: #b3b3b3;
+}
+
+.payment-details p:first-of-type {
+    font-weight: bold;
+    color: #66bb6a;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 15px;
+    
+}
+
+.cta-button:hover {
+    background-color: #66bb6a;
+}
+
+.payment-details .cta-button:disabled {
+    background-color: #888;
+    cursor: not-allowed;
+}
+
+.payment-details p:last-child {
+    color: #66bb6a;
+    font-weight: bold;
+}
+.payment-form-section {
+    padding: 20px;
+    background-color: #1c1c1c;
+    color: #f5f5f5;
+    border-radius: 8px;
+    max-width: 400px;
+    margin: auto;
+}
+
+.payment-form-section h2 {
+    color: #4caf50;
+    font-size: 24px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.payment-form-section label {
+    display: block;
+    margin-top: 10px;
+    color: #b3b3b3;
+}
+
+.payment-form-section input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    background-color: #333;
+    border: 1px solid #4caf50;
+    border-radius: 5px;
+    color: #f5f5f5;
+}
+
+.payment-form-section .cta-button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.payment-form-section .cta-button:hover {
+    background-color: #66bb6a;
+}
+
+.success-message {
+    color: #4caf50;
+    text-align: center;
+    margin-top: 20px;
+    font-size: 18px;
+}

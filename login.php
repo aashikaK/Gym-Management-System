@@ -1,3 +1,36 @@
+   <!-- Php for the form -->
+   <?php
+session_start();
+
+require 'connection.php';
+
+
+
+
+if(isset($_POST['login'])){
+    $username= $_POST['username'];
+    $password=$_POST['password'];
+
+    if (!empty($username) && !empty($password)) {
+        $sql = "SELECT * FROM users_login WHERE username = '$username' AND password = '$password'";
+        $result = mysqli_query($conn, $sql);
+
+        if (mysqli_num_rows($result) > 0) {
+            $row = mysqli_fetch_assoc($result);
+            $_SESSION['username'] = $username;
+            $_SESSION['id']= $row['id'];
+            header("Location: dashboard.php");
+            exit();
+         } 
+       else {
+            $error_msg = "Invalid username and password. Make sure you type the correct username and password.";
+       }
+     } else {
+         $error_msg = "Please enter both username and password.";
+     }
+ }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,19 +46,30 @@
         <div class="form">
             <div class="form-content">
                 <header>Login</header>
-                <form action="#">
+
+                <!-- PHP FOR ERROR MESSAGE -->
+
+                <!-- PHP FOR ERROR MESSAGE -->
+<?php if(!empty($error_msg)) { ?>
+    <p style="color:red; text-align: center;"><?php echo $error_msg; ?></p>
+<?php } ?>
+
+
+                <!-- form -->
+
+                <form action="" method="POST" enctype="multipart/form-data">
                     <div class="field">
-                        <input type="username" name="username" placeholder="Username ">
+                        <input type="text" name="username" placeholder="Username ">
                     </div>
                     <div class="field">
-                        <input type="password" name="" placeholder="Password ">
+                        <input type="password" name="password" placeholder="Password ">
                         <i class='bx bx-hide icon-a'></i>
                     </div>
                     <div class="link">
                         <a href="" class="forget">Forgot password?</a>
                     </div>
                     <div class="button">
-                        <button>Login</button>
+                        <button name="login" value="login">Login</button>
                     </div>
 
                 </form>
