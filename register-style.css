@@ -29,7 +29,7 @@
     position: relative;
 }
 .input-field i{
-    color: rgb(181, 214, 255);
+    color: rgb(0, 0, 0);
     margin-left: 15px;
 }
 .form-box h1::after{
@@ -44,14 +44,14 @@
     transform: translate(-50%);
 }
 .input-field{
-    background: rgba(61, 77, 124, 0.734);
+    background: rgb(232,240,255);
     margin: 15px 0;
     border-radius: 3px;
     display: flex;
     align-items: center;
 }
 input::placeholder{
-    color:rgb(147, 199, 255) ;
+    color:rgb(82, 94, 107) ;
 }
 input{
     width: 100%;

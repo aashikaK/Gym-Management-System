@@ -7,17 +7,17 @@ if (!isset($_SESSION['username'])) {
 
 require "connection.php";
 $username = $_SESSION['username'];
-
+$email = $_SESSION['email'];
 // Fetch user and payment info
 $sql = "
-    SELECT ui.membership, ui.membership_expiry_date, ui.bmi, ui.amount_due, ui.due_date, ui.status
+    SELECT ui.phone_no, ui.membership, ui.membership_expiry_date, ui.bmi, ui.amount_due, ui.due_date, ui.status
     FROM users_info ui 
     JOIN users_login ul ON ui.id = ul.id 
     WHERE ul.username = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $username);
 $stmt->execute();
-$stmt->bind_result($membership, $membership_expiry_date, $bmi, $amount_due, $due_date, $status);
+$stmt->bind_result($phonenumber,$membership, $membership_expiry_date, $bmi, $amount_due, $due_date, $status);
 $stmt->fetch();
 $stmt->close();
 
@@ -27,6 +27,10 @@ $expiry = new DateTime($due_date);
 $remaining_days = ($expiry > $current_date) ? $expiry->diff($current_date)->days : 0;
 
 $payment_message = ($status === 'Unpaid' && $remaining_days == 0) ? 'Payment is left to pay' : 'Your payment is up to date';
+
+
+$sql="SELECT  ui."
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -40,22 +44,26 @@ $payment_message = ($status === 'Unpaid' && $remaining_days == 0) ? 'Payment is 
 <body>
     <!-- Header Section -->
     <section class="header">
+        <!-- Left Section with Title and Logo -->
         <div class="left">
-            <h1 class="title" style="font-size:21px;">
+            <h1 class="title">
                 <img class="logo" src="images/logo.jpg" alt="ShapeShifter Fitness and Gym logo">
                 ShapeShifter Fitness Dashboard
             </h1>
         </div>
 
-        <div class="nav-bar">
-            <a href="#overview" style="margin-left:2px;">Overview</a>
+        <!-- Navigation Bar -->
+        <nav class="nav-bar">
+            <a href="#overview">Overview</a>
             <a href="#membership">Membership</a>
             <a href="#workouts">Workouts</a>
+            <a href="equipment_products">Equipment and Products</a>
             <a href="#payment">Make Payment</a>
             <a href="#profile">Profile</a>
             <a href="logout.php" class="logout">Logout</a>
-        </div>
+        </nav>
 
+        <!-- Search Form -->
         <div class="right">
             <form class="search" method="post">
                 <input type="search" name="query" placeholder="Search..." aria-label="Search">
@@ -63,6 +71,7 @@ $payment_message = ($status === 'Unpaid' && $remaining_days == 0) ? 'Payment is 
             </form>
         </div>
     </section>
+
 
     <!-- Dashboard Overview Section -->
     <section class="dashboard-overview" id="overview">
@@ -96,28 +105,35 @@ $payment_message = ($status === 'Unpaid' && $remaining_days == 0) ? 'Payment is 
     <a href="membership_action.php?action=upgrade" class="cta-button" style="text-decoration:none;">Upgrade Plan</a>
 </section>
 
+
+
     <!-- Workout Section -->
     <section class="dashboard-section" id="workouts">
-        <h2>Workout Programs</h2>
-        <p>Access your personalized workout plans and track progress.</p>
-        <div class="workout-list">
-            <div class="workout-item">
-                <h3>Weekly Workout</h3>
-                <p>5 Days, Full Body</p>
-                <button class="cta-button">Start Workout</button>
-            </div>
-            <div class="workout-item">
-                <h3>Cardio Blast</h3>
-                <p>3 Days, High Intensity</p>
-                <button class="cta-button">View Plan</button>
-            </div>
-            <div class="workout-item">
-                <h3>Strength Training</h3>
-                <p>4 Days, Strength Focused</p>
-                <button class="cta-button">View Progress</button>
-            </div>
-        </div>
-    </section>
+    <h2>Workout Programs</h2>
+    <p>Access your personalized workout plans and track progress. As well as choose the trainers for you.</p>
+    <a href="explore_workouts.php" class="cta-button" style="text-decoration:none;">Explore Our Workouts</a>
+        
+    </div>
+</section>
+
+
+<!-- Equipment and products section -->
+<!-- Equipment and Products Section -->
+<section class="dashboard-section" id="equipment-products">
+    <h2>Equipment and Products</h2>
+    <p>Browse our selection of gym equipment and fitness products available for purchase and rental.</p>
+    
+    <div class="equipment-products-actions">
+        <!-- Button to Buy Products -->
+        <a href="buy_products.php" class="cta-button" style="text-decoration:none;">Buy Products</a>
+        
+        <!-- Button to Rent and Buy Equipment -->
+        <a href="rent_buy_equipment.php" class="cta-button" style="text-decoration:none;">Rent/Buy Equipment</a>
+    </div>
+</section>
+
+
+
 
     <!-- Make Payment Section -->
     <section class="payment-section" id="payment">
@@ -150,8 +166,8 @@ if (isset($_SESSION['payment_success'])) {
         <p>Update your personal details and preferences.</p>
         <div class="profile-details">
             <p>Name: <?php echo htmlspecialchars($_SESSION['username']); ?></p>
-            <p>Email: [User Email]</p>
-            <p>Phone: [User Phone]</p>
+            <p>Email: <?php echo htmlspecialchars($_SESSION['email']);?> </p>
+            <p>Phone: <?php echo htmlspecialchars($phonenumber);?></p>
             <button class="cta-button">Edit Profile</button>
             <button class="cta-button">Change Password</button>
         </div>
@@ -169,13 +185,7 @@ if (isset($_SESSION['payment_success'])) {
 </body>
 </html>
 
-<form action="" method="POST">
-    <button name="logout">Logout</button>
-</form>
+
 
 <?php
-if (isset($_POST['logout'])) {
-    session_destroy();
-    header("Location:login.php");
-}
-?>
+
