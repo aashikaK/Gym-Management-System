@@ -111,7 +111,7 @@ $sql="SELECT  ui."
     <section class="dashboard-section" id="workouts">
     <h2>Workout Programs</h2>
     <p>Access your personalized workout plans and track progress. As well as choose the trainers for you.</p>
-    <a href="explore_workouts.php" class="cta-button" style="text-decoration:none;">Explore Our Workouts</a>
+    <a href="explore_workouts_instructors.php" class="cta-button" style="text-decoration:none;">Explore Our Workouts and Instructors</a>
         
     </div>
 </section>

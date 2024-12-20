@@ -4,7 +4,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = htmlspecialchars($_POST['email']);
     $message = htmlspecialchars($_POST['message']);
 
-    $to = "yourgymemail@example.com";
+    $to = "shapeshiftergym@gmail.com";
     $subject = "New message from " . $name;
     $body = "You have received a new message from your website contact form.\n\n".
             "Name: $name\nEmail: $email\n\nMessage:\n$message";

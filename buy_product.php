@@ -26,29 +26,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $quantity = $_POST['quantity'];
     $location = $_POST['location'];
     $bank_account = $_POST['bank_account'];
+    $requested_date = date('Y-m-d'); // Current date
 
     // Check if enough stock is available
     if ($quantity > $product['available_qty']) {
         $error_message = "Sorry, insufficient stock available.";
     } else {
-        // Calculate total price
-        $total_price = $product['discounted_amt'] * $quantity;
+        // Insert purchase request into pending_product table
+        $user_id = $_SESSION['id']; 
+        $insert_sql = "INSERT INTO pending_product (p_id, req_userid, requested_date, status) 
+                       VALUES ($product_id, $user_id, '$requested_date', 'pending')";
 
-        // Update the quantity in the database
-        $new_qty = $product['available_qty'] - $quantity;
-        $update_qty_sql = "UPDATE products SET available_qty = $new_qty WHERE id = $product_id";
-        $update_result = mysqli_query($conn, $update_qty_sql);
-
-        if ($update_result) {
-            // Show success message
-            $success_message = "Thank you for your purchase!<br>";
-            $success_message .= "You have bought {$quantity} unit(s) of {$product['name']}.<br>";
-            $success_message .= "Total Price: Rs {$total_price}<br>";
+        if (mysqli_query($conn, $insert_sql)) {
+            // Show pending approval message
+            $success_message = "Thank you for your purchase request!<br>";
+            $success_message .= "You have requested {$quantity} unit(s) of {$product['name']}.<br>";
+            $success_message .= "Total Price: Rs " . ($product['discounted_amt'] * $quantity) . "<br>";
             $success_message .= "Delivery Location: {$location}<br>";
             $success_message .= "Bank Account: {$bank_account}<br>";
-            $success_message .= "Your product will be delivered soon. <strong>Free Delivery!</strong>";
+            $success_message .= "Your order will be delivered after admin approval.";
         } else {
-            $error_message = "There was an error updating the product quantity. Please try again.";
+            $error_message = "There was an error processing your purchase request. Please try again.";
         }
     }
 }

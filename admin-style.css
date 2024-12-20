@@ -1,0 +1,200 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Body Styling */
+body {
+    background-color: #121212;
+    color: #f5f5f5;
+    line-height: 1.6; /* Slightly increased line height for better readability */
+    overflow-x: hidden;
+}
+
+/* Header Section */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #1f1f1f;
+    border-bottom: 2px solid #333;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
+}
+
+.admin-header .title {
+    display: flex;
+    align-items: center;
+    font-size: 22px; /* Increased for emphasis */
+    color: #f5f5f5;
+    font-weight: bold;
+}
+
+.admin-header .logo {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.nav-bar a {
+    color: #f5f5f5;
+    text-decoration: none;
+    font-size: 16px;
+    margin: 0 15px;
+    transition: color 0.3s;
+}
+
+.nav-bar a:hover {
+    color: #4caf50;
+}
+
+/* Logout Button */
+.logout {
+    background-color: #ff4d4d; /* Bright red for visibility */
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.logout:hover {
+    background-color: #e63939;
+    transform: scale(1.05); 
+}
+
+/* Section Styling */
+.admin-section {
+    padding: 25px; /* Increased padding for spacing */
+    background-color: #1c1c1c;
+    margin: 20px;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
+}
+
+.admin-section h2 {
+    color: #4caf50;
+    margin-bottom: 15px;
+    font-size: 24px; /* Larger for section headers */
+    font-weight: bold;
+}
+.admin-section p {
+    margin-bottom: 15px;
+    font-size: 16px; 
+}
+.requests {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Consistent spacing between items */
+}
+
+.request-item {
+    padding: 15px;
+    background-color: #333;
+    border-radius: 8px;
+}
+
+/* Buttons */
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+button:hover {
+    transform: scale(1.02); /* Subtle hover effect */
+}
+
+.approve-button {
+    background-color: #4caf50;
+    color: #fff;
+    margin-right: 10px;
+}
+
+.approve-button:hover {
+    background-color: #66bb6a;
+}
+
+.reject-button {
+    background-color: #ff5252;
+    color: #fff;
+}
+
+.reject-button:hover {
+    background-color: #ff1744;
+}
+
+/* Members Table 
+/* .members-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    overflow-x: auto; /* Ensures table doesn't overlap on small screens
+}
+
+.members-table th,
+.members-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border: 1px solid #444;
+}
+
+.members-table th {
+    background-color: #333;
+    color: #66bb6a;
+    font-weight: bold;
+}
+
+.members-table td {
+    color: #ddd; 
+}*/
+
+/* Call-to-Action Button */
+.cta-button {
+    padding: 10px 15px;
+    background-color: #4caf50;
+    color: #fff;
+    margin-right: 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.cta-button:hover {
+    background-color: #66bb6a;
+    transform: scale(1.05);
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #1f1f1f;
+    color: #777;
+    margin-top: 20px;
+    border-top: 2px solid #333;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .admin-section {
+        margin: 10px;
+    }
+
+    .members-table th,
+    .members-table td {
+        padding: 10px;
+    }
+
+    .requests {
+        gap: 10px; /* Adjust gap for smaller screens */
+    }
+}

@@ -8,8 +8,12 @@ if (!isset($_SESSION['username'])) {
 require "connection.php";
 $username = $_SESSION['username'];
 
-// Fetch equipment from the database
-$sql = "SELECT * FROM equipment";
+// Fetch equipment and rental details
+$sql = "SELECT e.*, r.available_rental_qty, 
+        (SELECT COUNT(*) FROM rental_transactions rt 
+         WHERE rt.rental_id = r.rental_id AND rt.is_returned = 0) AS rented_qty
+        FROM equipment e
+        LEFT JOIN rental_equipments r ON e.equipment_id = r.equipment_id";
 $result = mysqli_query($conn, $sql);
 ?>
 
@@ -60,7 +64,7 @@ $result = mysqli_query($conn, $sql);
         color: #ffff;
         padding-bottom: 9px;
     }
-    .buy-button, .rent-button {
+    .buy-button, .rent-button, .return-button {
         text-decoration: none;
         padding: 8px 16px;
         background-color: #28a745;
@@ -70,7 +74,7 @@ $result = mysqli_query($conn, $sql);
         display: inline-block;
         margin: 10px;
     }
-    .buy-button:hover, .rent-button:hover {
+    .buy-button:hover, .rent-button:hover, .return-button:hover {
         background-color: #218838;
     }
 </style>
@@ -78,23 +82,26 @@ $result = mysqli_query($conn, $sql);
     <h2>Our Equipments</h2>
     <div class="product-container">
         <?php
-        // Check if there is equipment in the database
         if (mysqli_num_rows($result) > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
-                // Display each equipment item with Buy and Rent options
+                $isRented = $row['rented_qty'] > 0;
                 echo '<div class="product">';
                 echo '<img src="' . htmlspecialchars($row['image_path']) . '" alt="' . htmlspecialchars($row['name']) . '">';
                 echo '<h3>' . htmlspecialchars($row['name']) . '</h3>';
                 echo '<p>Monthly Rent Price: Rs ' . number_format($row['rent_price_per_month'], 2) . '</p>';
                 echo '<p>Purchase Price: Rs ' . number_format($row['purchase_price'], 2) . '</p>';
                 echo '<a href="buy_equipment.php?id=' . $row['equipment_id'] . '" class="buy-button">Buy Now</a>';
-                if($row['purchase_price']<10000){
-                    echo '<span> <br> This equipment is not available for renting <span>';
-                } else{
-                echo '<a href="rent_equipment.php?id=' . $row['equipment_id'] . '" class="rent-button">Rent Now</a>';
-                }
+                
                 if ($row['available_quantity'] == 0) {
-                    echo '<span>This equipment is not available</span>';
+                    echo '<span>This equipment is not available for purchase</span>';
+                } elseif ($row['purchase_price'] < 10000) {
+                    echo '<span><br>This equipment is not available for renting</span>';
+                } else {
+                    echo '<a href="rent_equipment.php?id=' . $row['equipment_id'] . '" class="rent-button">Rent Now</a>';
+                }
+
+                if ($isRented) {
+                    echo '<a href="return_equipment.php?id=' . $row['equipment_id'] . '" class="return-button">Return</a>';
                 }
                 echo '</div>';
             }

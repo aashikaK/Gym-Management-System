@@ -4,32 +4,39 @@ session_start();
 
 require 'connection.php';
 
-
-
-
 if(isset($_POST['login'])){
     $username= $_POST['username'];
     $password=$_POST['password'];
+    
+if (!empty($username) && !empty($password)) {
+    // Check if the user is an admin
+    $query = "SELECT * FROM admin WHERE username = '$username' AND password = '$password'";
+       
+    $queryresult = mysqli_query($conn, $query);
+    if (mysqli_num_rows($queryresult) > 0) {
+        $_SESSION['admin_logged_in']=1;
+        header("Location: admin-panel.php");
+        exit();
+    }
+    // Check if the user is a regular user
+    $sql = "SELECT * FROM users_login WHERE username = '$username' AND password = '$password'";
+    $result = mysqli_query($conn, $sql);
+    
+    if (mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $_SESSION['username'] = $username;
+        $_SESSION['email'] = $row['email'];
+        $_SESSION['id'] = $row['id'];
+        header("Location: dashboard.php");
+        exit();
+    } else {
+        $error_msg = "Invalid username and password. Make sure you type the correct username and password.";
+    }
+} else {
+    $error_msg = "Please enter both username and password.";
+}
 
-    if (!empty($username) && !empty($password)) {
-        $sql = "SELECT * FROM users_login WHERE username = '$username' AND password = '$password'";
-        $result = mysqli_query($conn, $sql);
-
-        if (mysqli_num_rows($result) > 0) {
-            $row = mysqli_fetch_assoc($result);
-            $_SESSION['username'] = $username;
-            $_SESSION['email']= $row['email'];
-            $_SESSION['id']= $row['id'];
-            header("Location: dashboard.php");
-            exit();
-         } 
-       else {
-            $error_msg = "Invalid username and password. Make sure you type the correct username and password.";
-       }
-     } else {
-         $error_msg = "Please enter both username and password.";
-     }
- }
+ } 
 ?>
 
 <!DOCTYPE html>
