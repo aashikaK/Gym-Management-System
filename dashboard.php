@@ -4,33 +4,73 @@ if (!isset($_SESSION['username'])) {
     header('Location:login.php');
     exit;
 }
+$user_id=$_SESSION['id'];
 
 require "connection.php";
 $username = $_SESSION['username'];
 $email = $_SESSION['email'];
 // Fetch user and payment info
-$sql = "
-    SELECT ui.phone_no, ui.membership, ui.membership_expiry_date, ui.bmi, ui.amount_due, ui.due_date, ui.status
-    FROM users_info ui 
-    JOIN users_login ul ON ui.id = ul.id 
-    WHERE ul.username = ?";
+$sql = "SELECT phone_no, membership, membership_expiry_date, bmi, payment_due, payment_due_date, status
+    FROM users_info
+    WHERE id = ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $username);
+$stmt->bind_param("i", $user_id); // Assuming $user_id is defined and passed to the script
 $stmt->execute();
-$stmt->bind_result($phonenumber,$membership, $membership_expiry_date, $bmi, $amount_due, $due_date, $status);
+$stmt->bind_result($phonenumber, $membership, $membership_expiry_date, $bmi, $amount_due, $due_date, $status);
 $stmt->fetch();
 $stmt->close();
 
-// Calculate remaining days until payment due date or expiry date
+// Calculate remaining days and months exceeded since due_date
 $current_date = new DateTime();
-$expiry = new DateTime($due_date);
-$remaining_days = ($expiry > $current_date) ? $expiry->diff($current_date)->days : 0;
+if (!empty($due_date)) {
+    $expiry = new DateTime($due_date);
 
-$payment_message = ($status === 'Unpaid' && $remaining_days == 0) ? 'Payment is left to pay' : 'Your payment is up to date';
+    // Calculate remaining days until expiry date or 0 if expired
+    $remaining_days = ($expiry > $current_date) ? $expiry->diff($current_date)->days : 0;
 
+    // Calculate months exceeded after expiry date
+    if ($expiry < $current_date) {
+        $interval = $expiry->diff($current_date);
+        $months_exceeded = $interval->m + ($interval->y * 12);
 
-$sql="SELECT  ui."
+        // If today is after the expiry date but in the same month, count that as a full month
+        if ($current_date->format('d') > $expiry->format('d')) {
+            $months_exceeded++; // Add an extra month if we're in the middle of a month after expiry
+        }
 
+        // Calculate the amount due based on the months exceeded
+        $amount_due = $months_exceeded * 1000;
+    } else {
+        $months_exceeded = 0; // No months exceeded if not expired
+        $amount_due = 0; // No payment due if not expired
+    }
+} else {
+    // If no expiry date is provided, set defaults
+    $remaining_days = 0;
+    $months_exceeded = 0;
+    $amount_due = 0;
+}
+
+// Update the status and amount_due in the database if necessary
+if ($remaining_days == 0 && $months_exceeded > 0) {
+    $status_update_sql = "UPDATE users_info SET status = 'unpaid', payment_due = ? WHERE id = ?";
+    $stmt = $conn->prepare($status_update_sql);
+    $stmt->bind_param("ii", $amount_due, $user_id); // Bind the updated amount_due and user ID
+    $stmt->execute();
+    $stmt->close();
+}
+else{
+    $status_update_sql = "UPDATE users_info SET status = 'paid', payment_due = ? WHERE id = ?";
+    $stmt = $conn->prepare($status_update_sql);
+    $stmt->bind_param("ii", $amount_due, $user_id); // Bind the updated amount_due and user ID
+    $stmt->execute();
+    $stmt->close();
+    
+}
+// Generate payment message
+$payment_message = ($status === 'unpaid' && $remaining_days == 0) 
+    ? 'Payment is left to pay' 
+    : 'Your payment is up to date';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -103,6 +143,20 @@ $sql="SELECT  ui."
     <p>Manage your membership plan, upgrade options, and view exclusive offers.</p>
     <a href="membership_action.php?action=renew" class="cta-button" style="text-decoration:none;">Renew Membership</a>
     <a href="membership_action.php?action=upgrade" class="cta-button" style="text-decoration:none;">Upgrade Plan</a>
+    <?php
+    if(isset($_SESSION['renewal_req_exists'])){
+        echo "<p class='success-message'>" . $_SESSION['renewal_req_exists'] . "</p>";
+    unset($_SESSION['renewal_req_exists']);
+    }
+if (isset($_SESSION['mem_payment_success'])) {
+    echo "<p class='success-message'>" . $_SESSION['mem_payment_success'] . "</p>";
+    unset($_SESSION['mem_payment_success']);
+}
+if (isset($_SESSION['upgrade_req_exists'])) {
+    echo "<p class='success-message'>" . $_SESSION['upgrade_req_exists'] . "</p>";
+    unset($_SESSION['upgrade_req_exists']);
+}
+?>
 </section>
 
 
@@ -144,7 +198,7 @@ $sql="SELECT  ui."
         <p>Remaining Days: <?php echo $remaining_days; ?> days</p>
         <p>Status: <?php echo htmlspecialchars($status); ?></p>
 
-        <?php if ($status === 'Unpaid' && $remaining_days == 0) { ?>
+        <?php if ($status === 'unpaid' && $remaining_days == 0) { ?>
     <a href="pay_now.php" style="text-decoration: none;" class="cta-button">Pay Now</a>
 <?php } else { ?>
     <p><?php echo $payment_message; ?></p>
@@ -168,8 +222,11 @@ if (isset($_SESSION['payment_success'])) {
             <p>Name: <?php echo htmlspecialchars($_SESSION['username']); ?></p>
             <p>Email: <?php echo htmlspecialchars($_SESSION['email']);?> </p>
             <p>Phone: <?php echo htmlspecialchars($phonenumber);?></p>
+            <a href="edit_profile.php" style="text-decoration: none;" class="cta-button">Edit Profile</a>
+            <a href="change_pw.php" style="text-decoration: none;" class="cta-button">Change Password</a>
+<!-- 
             <button class="cta-button">Edit Profile</button>
-            <button class="cta-button">Change Password</button>
+            <button class="cta-button">Change Password</button> -->
         </div>
     </section>
 

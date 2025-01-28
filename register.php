@@ -17,19 +17,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $errorMsg = 'Invalid email format.';
     } else {
         // Check if username already exists
-        $sql = "SELECT * FROM users_login WHERE username = '$username'";
-        $checkResult = mysqli_query($conn, $sql);
+        $sql = "SELECT * FROM users_login WHERE username = ?";
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param('s', $username);  // Bind the username to the prepared statement
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-        if (mysqli_num_rows($checkResult) > 0) {
-            $errorMsg = 'Username already exists. Please choose another.';
-        } else {
-            // Insert valid data into the database
-            $insertQuery = "INSERT INTO users_login (username, email, password) VALUES ('$username', '$email', '$password')";
-            if (mysqli_query($conn, $insertQuery)) {
-                $successMsg = 'Registration Successful!';
+            if ($result->num_rows > 0) {
+                // Username already exists
+                $errorMsg = 'Username already exists. Please choose another.';
             } else {
-                $errorMsg = 'Error during registration. Please try again.';
+                // Insert valid data into the users_login table
+                $insertQuery = "INSERT INTO users_login (username, email, password) VALUES (?, ?, ?)";
+                if ($stmt = $conn->prepare($insertQuery)) {
+                    $stmt->bind_param('sss', $username, $email, $password);  // Bind the form data
+                    if ($stmt->execute()) {
+                        // Get the last inserted user ID
+                        $user_id = $conn->insert_id;
+
+                        // Now insert the user ID into the users_info table as a foreign key
+                        $insertInUsersInfo = "INSERT INTO users_info (id, payment_due) VALUES (?, 1000)";
+                        if ($stmt = $conn->prepare($insertInUsersInfo)) {
+                            $stmt->bind_param('i', $user_id);  // Bind the user ID to the prepared statement
+                            if ($stmt->execute()) {
+                                $successMsg = 'Registration Successful!';
+                            } else {
+                                $errorMsg = 'Error inserting into users_info table. Please try again.';
+                            }
+                        }
+                        else {
+                        $errorMsg = 'Error during registration. Please try again.';
+                    }
+                }
             }
+
+            $stmt->close();  // Close the prepared statement
         }
     }
 

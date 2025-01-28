@@ -7,20 +7,21 @@ if (isset($_SESSION['id'])) {
     $user_id = $_SESSION['id']; // Get the user ID from the session
 
     // Fetch all active workout plans for the user
-    $sql_workouts = "SELECT w.workout_id, w.name AS workout_name, w.description AS workout_description, w.frequency, w.image_url
-                     FROM workouts w 
-                     JOIN users_workout uw ON w.workout_id = uw.workout_id
-                     WHERE uw.user_id = $user_id AND uw.status = 'active'";
-    $result_workouts = $conn->query($sql_workouts);
+   // Fetch all active workouts for all users
+   $sql_workouts = "SELECT workout_id, name AS workout_name, description AS workout_description, frequency, image_url
+   FROM workouts";
+   
+$result_workouts = $conn->query($sql_workouts);
 
-    if ($result_workouts->num_rows > 0) {
-        $workouts = [];
-        while ($row = $result_workouts->fetch_assoc()) {
-            $workouts[] = $row;
-        }
-    } else {
-        $no_workouts_message = "No active workouts assigned.";
-    }
+if ($result_workouts->num_rows > 0) {
+$workouts = [];
+while ($row = $result_workouts->fetch_assoc()) {
+$workouts[] = $row;
+}
+} else {
+$no_workouts_message = "No active workouts available.";
+}
+
 
     // Fetch all available instructors
     $sql_instructors = "SELECT id, name, specialty, experience, image_url FROM instructors WHERE availability = 1 AND status = 'active'";
@@ -38,10 +39,12 @@ if (isset($_SESSION['id'])) {
     // Handle form submission to assign an instructor
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['instructor_id'])) {
         $instructor_id = $_POST['instructor_id'];
-        $sql_update = "UPDATE users SET assigned_instructor = $instructor_id WHERE id = $user_id";
+$requested_date= date('Y-m-d H:i:s');
+        $approve_instructor_sql = "INSERT INTO instructor_request(instructor_id,user_id,requested_date,status,approved_date) 
+        VALUES($instructor_id,$user_id,'$requested_date','pending',NULL) ";
 
-        if ($conn->query($sql_update)) {
-            $success_message = "Instructor assigned successfully!";
+        if ($conn->query($approve_instructor_sql)) {
+            $success_message = "Instructor request submitted for admin's approval!";
         } else {
             $error_message = "Error assigning instructor.";
         }
