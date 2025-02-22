@@ -11,7 +11,7 @@ $product_id = $_GET['id'];
 $sql = "SELECT * FROM products WHERE id = $product_id";
 $result = mysqli_query($conn, $sql);
 $product = mysqli_fetch_assoc($result);
-
+$_SESSION['name'] = $product['name'];
 if (!$product) {
     echo "Product not found.";
     exit;
@@ -34,8 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         // Insert purchase request into pending_product table
         $user_id = $_SESSION['id']; 
-        $insert_sql = "INSERT INTO pending_product (p_id, req_userid, requested_date, status) 
-                       VALUES ($product_id, $user_id, '$requested_date', 'pending')";
+        $insert_sql = "INSERT INTO pending_product (p_id, req_userid,requested_qty, requested_date, status) 
+                       VALUES ($product_id, $user_id, $quantity,'$requested_date', 'pending')";
 
         if (mysqli_query($conn, $insert_sql)) {
             // Show pending approval message
@@ -104,12 +104,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             font-weight: bold;
             margin-top: 5px;
         }
-
         .buy-button {
             text-align: center;
             margin-top: 20px;
         }
-
         .buy-button button {
             padding: 10px 20px;
             background-color: #28a745;
@@ -119,7 +117,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             border-radius: 5px;
             cursor: pointer;
         }
-
         .buy-button button:hover {
             background-color: #218838;
         }
@@ -136,6 +133,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .success-message { 
             color: green; 
         }
+        a{
+            text-decoration:none;
+            background-color:green;
+            border-radius:4%;
+            color:white;
+            font-size:15px;
+                }
+              p{
+            color:black;
+            font-size:15px;
+                }
     </style>
 <body>
     <!-- Display Success/Error Message -->
@@ -150,8 +158,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?php endif; ?>
         
     <div class="purchase-container">
+        
+<p>Click <a href="dashboard.php">here to go back to dashboard.</a> </p>
         <h2>Buy <?php echo htmlspecialchars($product['name']); ?></h2>
-
         <form action="" method="POST">
             <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
 
@@ -174,6 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="buy-button">
                 <button type="submit">Confirm Purchase</button>
             </div>
+            
         </form>
     </div>
 
@@ -185,5 +195,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             document.getElementById('total_price').textContent = 'Total: Rs ' + total.toFixed(2);
         }
     </script>
+
+    <?php
+    if(isset($_POST['goback'])){
+        header("Location:dashboard.php");
+    }?>
 </body>
 </html>

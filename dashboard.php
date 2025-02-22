@@ -156,18 +156,35 @@ if (isset($_SESSION['upgrade_req_exists'])) {
     echo "<p class='success-message'>" . $_SESSION['upgrade_req_exists'] . "</p>";
     unset($_SESSION['upgrade_req_exists']);
 }
+if (isset($_SESSION['memb_req_approved'])) {
+    echo "<p class='success-message'>" . $_SESSION['memb_req_approved'] . "</p>";
+    unset($_SESSION['memb_req_approved']);
+}
+if (isset($_SESSION['memb_req_denied'])) {
+    echo "<p class='success-message'>" . $_SESSION['memb_req_denied'] . "</p>";
+    unset($_SESSION['memb_req_denied']);
+}
 ?>
 </section>
 
 
 
-    <!-- Workout Section -->
+    <!-- Workout and Instructors Section -->
     <section class="dashboard-section" id="workouts">
     <h2>Workout Programs</h2>
     <p>Access your personalized workout plans and track progress. As well as choose the trainers for you.</p>
     <a href="explore_workouts_instructors.php" class="cta-button" style="text-decoration:none;">Explore Our Workouts and Instructors</a>
-        
-    </div>
+    <?php
+    if(isset($_SESSION['intructor_req_approved'])){
+        echo "<p class='success-message'>" . $_SESSION['intructor_req_approved'] . "</p>";
+        unset($_SESSION['intructor_req_approved']);
+    }
+    if(isset($_SESSION['intructor_req_denied'])){
+        echo "<p class='success-message'>" . $_SESSION['intructor_req_denied'] . "</p>";
+        unset($_SESSION['intructor_req_denied']);
+    }
+    ?>
+    
 </section>
 
 
@@ -184,6 +201,24 @@ if (isset($_SESSION['upgrade_req_exists'])) {
         <!-- Button to Rent and Buy Equipment -->
         <a href="rent_buy_equipment.php" class="cta-button" style="text-decoration:none;">Rent/Buy Equipment</a>
     </div>
+    <?php
+    if(isset($_SESSION['prod_req_approved'])){
+        echo "<p class='success-message'>" . $_SESSION['prod_req_approved'] . "</p>";
+        unset($_SESSION['prod_req_approved']);
+    }
+    if(isset($_SESSION['prod_req_denied'])){
+        echo "<p class='success-message'>" . $_SESSION['prod_req_denied'] . "</p>";
+        unset($_SESSION['prod_req_denied']);
+    }
+    if(isset($_SESSION['eqp_req_approved'])){
+        echo "<p class='success-message'>" . $_SESSION['eqp_req_approved'] . "</p>";
+        unset($_SESSION['eqp_req_approved']);
+    }
+    if(isset($_SESSION['eqp_req_denied'])){
+        echo "<p class='success-message'>" . $_SESSION['eqp_req_denied'] . "</p>";
+        unset($_SESSION['eqp_req_denied']);
+    }
+    ?>
 </section>
 
 

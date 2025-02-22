@@ -36,8 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $req_userid = $_SESSION['id']; // Get the logged-in user's ID
         $requested_date = date('Y-m-d H:i:s'); // Get the current date and time
-        $admin_approv_sql = "INSERT INTO pending_equipment(e_id, req_userid, requested_date, status, approved_date) 
-        VALUES($equipment_id, $req_userid, '$requested_date', 'pending', NULL)";
+        $admin_approv_sql = "INSERT INTO pending_equipment(e_id, req_userid,requested_qty, requested_date, status, approved_date) 
+        VALUES($equipment_id, $req_userid,$quantity, '$requested_date', 'pending', NULL)";
         
  $update_result = mysqli_query($conn, $admin_approv_sql);
 
@@ -140,6 +140,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     .success-message { 
         color: green; 
     }
+    a{
+            text-decoration:none;
+            background-color:green;
+            border-radius:4%;
+            color:white;
+            font-size:15px;
+                }
+              p{
+            color:black;
+            font-size:15px;
+                }
 </style>
 
 <body>
@@ -154,6 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <?php endif; ?>
     
     <div class="purchase-container">
+    <p>Click <a href="dashboard.php">here to go back to dashboard.</a> </p>
         <h2>Buy <?php echo htmlspecialchars($equipment['name']); ?></h2>
 
         <form action="" method="POST">

@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 $errorMsg = 'Error inserting into users_info table. Please try again.';
                             }
                         }
-                        else {
+                        lelse {
                         $errorMsg = 'Error during registration. Please try again.';
                     }
                 }

@@ -28,6 +28,20 @@ if (isset($_SESSION['id'])) {
     exit();
 }
 ?>
+<?php
+if(isset($_POST['removewBtn'])){
+    $user_id = $_SESSION['id'];
+    $workout_id = $_POST['workout_id'];
+    $delete_query = "DELETE FROM users_workout WHERE user_id = '$user_id' AND workout_id = '$workout_id' ";
+    $delResult=mysqli_query($conn,$delete_query);
+    if($delResult){
+        echo "Successfully deleted. Refresh the page to see the result.";
+    }
+    else {
+        echo "There was occurance of an error while deleting.";
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,7 +93,12 @@ if (isset($_SESSION['id'])) {
                     <h3><?php echo $workout['workout_name']; ?></h3>
                     <p><?php echo $workout['workout_description']; ?></p>
                     <p><strong>Frequency:</strong> <?php echo $workout['frequency']; ?></p>
-                    <button class="cta-button" onclick="window.location.href='workout_start.php?workout_id=<?php echo $workout['workout_id']; ?>'">Start this Workout</button>
+                    <form action="" method="post">
+                    <form action="" method="post">
+                        <input type="hidden" name="workout_id" value="<?php echo $workout['workout_id']; ?>">
+                        <button class="cta-button" name="removewBtn">Remove from my workout plan</button>
+                    </form>
+                    </form>
                 </div>
             </div>
         <?php } ?>
@@ -88,3 +107,6 @@ if (isset($_SESSION['id'])) {
     <?php } ?>
 </body>
 </html>
+
+
+

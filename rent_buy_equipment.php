@@ -100,9 +100,22 @@ $result = mysqli_query($conn, $sql);
                     echo '<a href="rent_equipment.php?id=' . $row['equipment_id'] . '" class="rent-button">Rent Now</a>';
                 }
 
-                if ($isRented) {
-                    echo '<a href="return_equipment.php?id=' . $row['equipment_id'] . '" class="return-button">Return</a>';
-                }
+                $rental_sql = "SELECT status FROM pending_rental 
+                WHERE user_id = '{$_SESSION['id']}' 
+                AND e_id = '{$row['equipment_id']}'";
+ 
+ $rental_result = mysqli_query($conn, $rental_sql);
+ 
+ if ($rental_result && mysqli_num_rows($rental_result) > 0) {  
+     $rentalrow = mysqli_fetch_assoc($rental_result);
+     $status = $rentalrow['status'];
+ 
+     if ($status == 'complete') {
+         echo '<a href="return_equipment.php?id=' . $row['equipment_id'] . '" class="return-button">Return</a>';
+     }
+ }
+ 
+                
                 echo '</div>';
             }
         } else {

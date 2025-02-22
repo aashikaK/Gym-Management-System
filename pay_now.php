@@ -60,10 +60,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Insert payment request into the pending_payment table
     $req_userid = $_SESSION['id'];
     $requested_date = date('Y-m-d H:i:s');
-    $admin_approv_sql = "INSERT INTO pending_payment (req_userid, requested_date, status, approved_date) 
-                          VALUES (?, ?, ?, NULL)";
+    $admin_approv_sql = "INSERT INTO pending_payment (req_userid,amount_paid, requested_date, status, approved_date) 
+                          VALUES (?,?, ?, ?, NULL)";
     $stmt = $conn->prepare($admin_approv_sql);
-    $stmt->bind_param("iss", $req_userid, $requested_date, $payment_status);
+    $stmt->bind_param("iss", $req_userid,$amount_paid, $requested_date, $payment_status);
     $stmt->execute();
     $stmt->close();
 
