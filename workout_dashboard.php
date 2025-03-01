@@ -35,11 +35,14 @@ if(isset($_POST['removewBtn'])){
     $delete_query = "DELETE FROM users_workout WHERE user_id = '$user_id' AND workout_id = '$workout_id' ";
     $delResult=mysqli_query($conn,$delete_query);
     if($delResult){
-        echo "Successfully deleted. Refresh the page to see the result.";
+        echo "Successfully deleted. .";
+
     }
     else {
         echo "There was occurance of an error while deleting.";
     }
+    header("Location: workout_dashboard.php");
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -93,12 +96,17 @@ if(isset($_POST['removewBtn'])){
                     <h3><?php echo $workout['workout_name']; ?></h3>
                     <p><?php echo $workout['workout_description']; ?></p>
                     <p><strong>Frequency:</strong> <?php echo $workout['frequency']; ?></p>
-                    <form action="" method="post">
+                    
+                    <form action="update_workout_status.php" method="post">
+    <input type="hidden" name="workout_id" value="<?php echo $workout['workout_id']; ?>">
+    <button class="cta-button" type="submit">Update Status</button>
+</form>
+
                     <form action="" method="post">
                         <input type="hidden" name="workout_id" value="<?php echo $workout['workout_id']; ?>">
                         <button class="cta-button" name="removewBtn">Remove from my workout plan</button>
                     </form>
-                    </form>
+                    
                 </div>
             </div>
         <?php } ?>

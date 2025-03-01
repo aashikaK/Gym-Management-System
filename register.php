@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 $errorMsg = 'Error inserting into users_info table. Please try again.';
                             }
                         }
-                        lelse {
+                        else {
                         $errorMsg = 'Error during registration. Please try again.';
                     }
                 }
@@ -58,5 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Redirect back with error or success message
     header("Location: register.html?errorMsg=" . urlencode($errorMsg) . "&successMsg=" . urlencode($successMsg));
     exit();
+}
 }
 ?>

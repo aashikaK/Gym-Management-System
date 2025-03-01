@@ -97,7 +97,7 @@ $payment_message = ($status === 'unpaid' && $remaining_days == 0)
             <a href="#overview">Overview</a>
             <a href="#membership">Membership</a>
             <a href="#workouts">Workouts</a>
-            <a href="equipment_products">Equipment and Products</a>
+            <a href="#equipment_products">Equipment and Products</a>
             <a href="#payment">Make Payment</a>
             <a href="#profile">Profile</a>
             <a href="logout.php" class="logout">Logout</a>
@@ -156,15 +156,21 @@ if (isset($_SESSION['upgrade_req_exists'])) {
     echo "<p class='success-message'>" . $_SESSION['upgrade_req_exists'] . "</p>";
     unset($_SESSION['upgrade_req_exists']);
 }
-if (isset($_SESSION['memb_req_approved'])) {
-    echo "<p class='success-message'>" . $_SESSION['memb_req_approved'] . "</p>";
-    unset($_SESSION['memb_req_approved']);
-}
-if (isset($_SESSION['memb_req_denied'])) {
-    echo "<p class='success-message'>" . $_SESSION['memb_req_denied'] . "</p>";
-    unset($_SESSION['memb_req_denied']);
-}
-?>
+    $fetchNotifications = "SELECT id, message FROM notifications WHERE user_id='$user_id' AND status='unread' AND section='membership'";
+    $result = mysqli_query($conn, $fetchNotifications);
+    
+    if ($result && mysqli_num_rows($result) > 0) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            echo "<p class='success-message'>" . htmlspecialchars($row['message']) . "</p>";
+    
+            // Mark notification as read after displaying it
+            $notif_id = $row['id'];
+            $markAsRead = "UPDATE notifications SET status='read' WHERE id='$notif_id'";
+            mysqli_query($conn, $markAsRead);
+        }
+    }
+    ?>
+
 </section>
 
 
@@ -174,52 +180,62 @@ if (isset($_SESSION['memb_req_denied'])) {
     <h2>Workout Programs</h2>
     <p>Access your personalized workout plans and track progress. As well as choose the trainers for you.</p>
     <a href="explore_workouts_instructors.php" class="cta-button" style="text-decoration:none;">Explore Our Workouts and Instructors</a>
+    
     <?php
-    if(isset($_SESSION['intructor_req_approved'])){
-        echo "<p class='success-message'>" . $_SESSION['intructor_req_approved'] . "</p>";
-        unset($_SESSION['intructor_req_approved']);
-    }
-    if(isset($_SESSION['intructor_req_denied'])){
-        echo "<p class='success-message'>" . $_SESSION['intructor_req_denied'] . "</p>";
-        unset($_SESSION['intructor_req_denied']);
+    $fetchNotifications = "SELECT id, message FROM notifications WHERE user_id='$user_id' AND status='unread' AND section='instructor'";
+    $result = mysqli_query($conn, $fetchNotifications);
+    
+    if ($result && mysqli_num_rows($result) > 0) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            echo "<p class='success-message'>" . htmlspecialchars($row['message']) . "</p>";
+    
+            // Mark notification as read after displaying it
+            $notif_id = $row['id'];
+            $markAsRead = "UPDATE notifications SET status='read' WHERE id='$notif_id'";
+            mysqli_query($conn, $markAsRead);
+        }
     }
     ?>
     
 </section>
 
 
-<!-- Equipment and products section -->
 <!-- Equipment and Products Section -->
-<section class="dashboard-section" id="equipment-products">
+<section class="dashboard-section" id="equipment_products">
     <h2>Equipment and Products</h2>
     <p>Browse our selection of gym equipment and fitness products available for purchase and rental.</p>
     
     <div class="equipment-products-actions">
-        <!-- Button to Buy Products -->
         <a href="buy_products.php" class="cta-button" style="text-decoration:none;">Buy Products</a>
-        
-        <!-- Button to Rent and Buy Equipment -->
         <a href="rent_buy_equipment.php" class="cta-button" style="text-decoration:none;">Rent/Buy Equipment</a>
     </div>
+
     <?php
-    if(isset($_SESSION['prod_req_approved'])){
-        echo "<p class='success-message'>" . $_SESSION['prod_req_approved'] . "</p>";
-        unset($_SESSION['prod_req_approved']);
+    
+    //displaying rejected or approved msg for buying produts and equipments,renting and returning rentall equipments
+   
+    $fetchNotifications = "SELECT id, message FROM notifications 
+    WHERE user_id='$user_id' 
+    AND status='unread' 
+    AND section IN ('prod_equip', 'return_rental', 'rental')";
+
+    $result = mysqli_query($conn, $fetchNotifications);
+    
+    if ($result && mysqli_num_rows($result) > 0) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            echo "<p class='success-message'>" . htmlspecialchars($row['message']) . "</p>";
+    
+            // Mark notification as read after displaying it
+            $notif_id = $row['id'];
+            $markAsRead = "UPDATE notifications SET status='read' WHERE id='$notif_id'";
+            mysqli_query($conn, $markAsRead);
+        }
     }
-    if(isset($_SESSION['prod_req_denied'])){
-        echo "<p class='success-message'>" . $_SESSION['prod_req_denied'] . "</p>";
-        unset($_SESSION['prod_req_denied']);
-    }
-    if(isset($_SESSION['eqp_req_approved'])){
-        echo "<p class='success-message'>" . $_SESSION['eqp_req_approved'] . "</p>";
-        unset($_SESSION['eqp_req_approved']);
-    }
-    if(isset($_SESSION['eqp_req_denied'])){
-        echo "<p class='success-message'>" . $_SESSION['eqp_req_denied'] . "</p>";
-        unset($_SESSION['eqp_req_denied']);
-    }
+
+
     ?>
 </section>
+
 
 
 
@@ -233,7 +249,8 @@ if (isset($_SESSION['memb_req_denied'])) {
         <p>Remaining Days: <?php echo $remaining_days; ?> days</p>
         <p>Status: <?php echo htmlspecialchars($status); ?></p>
 
-        <?php if ($status === 'unpaid' && $remaining_days == 0) { ?>
+        <?php 
+        if ($status === 'unpaid' && $remaining_days == 0) { ?>
     <a href="pay_now.php" style="text-decoration: none;" class="cta-button">Pay Now</a>
 <?php } else { ?>
     <p><?php echo $payment_message; ?></p>
@@ -246,7 +263,21 @@ if (isset($_SESSION['payment_success'])) {
     echo "<p class='success-message'>" . $_SESSION['payment_success'] . "</p>";
     unset($_SESSION['payment_success']);
 }
-?>
+    $fetchNotifications = "SELECT id, message FROM notifications WHERE user_id='$user_id' AND status='unread' and section='payment'";
+    $result = mysqli_query($conn, $fetchNotifications);
+    
+    if ($result && mysqli_num_rows($result) > 0) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            echo "<p class='success-message'>" . htmlspecialchars($row['message']) . "</p>";
+    
+            // Mark notification as read after displaying it
+            $notif_id = $row['id'];
+            $markAsRead = "UPDATE notifications SET status='read' WHERE id='$notif_id'";
+            mysqli_query($conn, $markAsRead);
+        }
+    }
+    ?>
+
 </section>
 
     <!-- Profile Section -->
@@ -269,9 +300,9 @@ if (isset($_SESSION['payment_success'])) {
     <footer class="footer">
         <p>&copy; 2024 ShapeShifter Fitness and Gym. All rights reserved.</p>
         <div class="social-media">
-            <a href="#"><i class="fa-brands fa-facebook"></i></a>
-            <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
-            <a href="#"><i class="fa-brands fa-instagram"></i></a>
+            <a href="http://www.facebook.com/" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+            <a href="https://x.com/" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="http://www.instagram.com/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
         </div>
     </footer>
 </body>

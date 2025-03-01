@@ -15,6 +15,7 @@ $sql = "SELECT e.*, r.available_rental_qty,
         FROM equipment e
         LEFT JOIN rental_equipments r ON e.equipment_id = r.equipment_id";
 $result = mysqli_query($conn, $sql);
+
 ?>
 
 <!DOCTYPE html>
@@ -100,20 +101,25 @@ $result = mysqli_query($conn, $sql);
                     echo '<a href="rent_equipment.php?id=' . $row['equipment_id'] . '" class="rent-button">Rent Now</a>';
                 }
 
-                $rental_sql = "SELECT status FROM pending_rental 
-                WHERE user_id = '{$_SESSION['id']}' 
-                AND e_id = '{$row['equipment_id']}'";
+                $rental_sql = "SELECT pr.status, rt.is_returned 
+                FROM pending_rental pr
+                JOIN rental_transactions rt ON pr.e_id = rt.rental_id
+                WHERE pr.user_id = '{$_SESSION['id']}' 
+                AND pr.e_id = '{$row['equipment_id']}'
+                AND rt.is_returned = 0";
+ 
  
  $rental_result = mysqli_query($conn, $rental_sql);
- 
- if ($rental_result && mysqli_num_rows($rental_result) > 0) {  
-     $rentalrow = mysqli_fetch_assoc($rental_result);
-     $status = $rentalrow['status'];
- 
-     if ($status == 'complete') {
-         echo '<a href="return_equipment.php?id=' . $row['equipment_id'] . '" class="return-button">Return</a>';
-     }
- }
+
+
+ $rental_result = mysqli_query($conn, $rental_sql);
+if ($rental_result && mysqli_num_rows($rental_result) > 0) {  
+    $rentalrow = mysqli_fetch_assoc($rental_result);
+    if ($rentalrow['status'] == 'complete' && $rentalrow['is_returned'] == 0) {
+        echo '<a href="return_equipment.php?id=' . $row['equipment_id'] . '" class="return-button">Return</a>';
+    }
+}
+
  
                 
                 echo '</div>';

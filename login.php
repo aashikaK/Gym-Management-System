@@ -48,49 +48,44 @@ if (!empty($username) && !empty($password)) {
     <title>Login</title>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="style-login.css">
+    <script src="./login-script.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
+
 <body>
     <section class="container forms">
         <div class="form">
             <div class="form-content">
                 <header>Login</header>
+                <p style="color: red;"><?php echo isset($error_msg) ? $error_msg : ''; ?></p>
 
-                <!-- PHP FOR ERROR MESSAGE -->
-
-                <!-- PHP FOR ERROR MESSAGE -->
-<?php if(!empty($error_msg)) { ?>
-    <p style="color:red; text-align: center;"><?php echo $error_msg; ?></p>
-<?php } ?>
-
-
-                <!-- form -->
-
-                <form action="" method="POST" enctype="multipart/form-data">
+                <form action="" method="post">
                     <div class="field">
-                        <input type="text" name="username" placeholder="Username ">
+                        <input type="text" name="username" placeholder="Username">
                     </div>
                     <div class="field">
-                        <input type="password" name="password" placeholder="Password ">
-                        <i class='bx bx-hide icon-a'></i>
-                    </div>
+    <input type="password" name="password" placeholder="Password" id="password">
+    <i class="bx bx-hide icon-a"></i>
+</div>
+
+
                     <div class="link">
-                        <a href="" class="forget">Forgot password?</a>
+                        <a href="forgot-password.html" class="forget">Forgot password?</a>
                     </div>
                     <div class="button">
-                        <button name="login" value="login">Login</button>
+                        <button type="submit" name="login">Login</button>
                     </div>
-
                 </form>
             </div>
             <div class="line"></div>
             <div class="icon">
-                <a href="" class="google">
-                    <img src="./images/google.jpg" alt="" class="google-img">
-                    <span>Login with google</span>
-                </a>
+                <div id="g_id_onload"
+                     data-client_id="YOUR_GOOGLE_CLIENT_ID"
+                     data-callback="handleCredentialResponse">
+                </div>
+                <div class="g_id_signin" data-type="standard"></div>
             </div>
         </div>
     </section>
 </body>
-<script src="login-script.js"></script>
 </html>

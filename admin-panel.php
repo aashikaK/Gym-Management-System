@@ -41,7 +41,7 @@ require 'connection.php';
         <div class="requests">
         <?php
             // Fetch pending requests
-            $sql = "SELECT p.*, u.username, pd.name 
+            $sql = "SELECT p.*, u.username,u.id, pd.name 
         FROM pending_product p
         INNER JOIN users_login u ON p.req_userid = u.id
         INNER JOIN products pd ON p.p_id = pd.id
@@ -55,6 +55,7 @@ require 'connection.php';
                     $pid=$row['p_id'];
                     $requestedQty = $row['requested_qty'];
                     $username = $row['username'];
+                    $user_id=$row['id'];
                     ?>
                    <form action="" method="post">
     <p><strong>Requested user:</strong> <?= htmlspecialchars($username); ?></p>
@@ -65,6 +66,8 @@ require 'connection.php';
     <input type="hidden" name="product_name" value="<?= htmlspecialchars($productName); ?>">
     <input type="hidden" name="requested_qty" value="<?= htmlspecialchars($requestedQty); ?>">
     <input type="hidden" name="p_id" value="<?= htmlspecialchars($pid); ?>">
+    <input type="hidden" name="user_id" value="<?= htmlspecialchars($user_id); ?>">
+
 </form>
                     <?php
                 }
@@ -73,6 +76,7 @@ require 'connection.php';
             if (isset($_POST['approve_prod'])) {
                 $productName = $_POST['product_name'];
                 $requestedQty = $_POST['requested_qty'];
+                $user_id = $_POST['user_id'];
                 // Update the pending_product status
                 $updatePending = "UPDATE pending_product SET status='complete', approved_date=NOW() WHERE p_id='$pid'";
                 mysqli_query($conn, $updatePending);
@@ -80,8 +84,10 @@ require 'connection.php';
                 // Update the product quantity
                 $updateProduct = "UPDATE products SET available_qty = available_qty - $requestedQty WHERE name='$productName'";
                 mysqli_query($conn, $updateProduct);
-                $_SESSION['prod_req_approved']="Your request for buying $productName was approved. The product will be delivered soon";
-
+                $message = "Your request for buying $productName was approved. The product will be delivered soon.";
+                $insertNotification = "INSERT INTO notifications (user_id, message,section) VALUES ('$user_id', '$message','prod_eqp')";
+                mysqli_query($conn, $insertNotification);
+            
                 echo "Request approved and quantity updated.";
                 header("Location: ".$_SERVER['PHP_SELF']); 
                 exit();
@@ -89,11 +95,14 @@ require 'connection.php';
             if (isset($_POST['reject_prod'])) {
                 $pid = $_POST['p_id'];
                 $productName = $_POST['product_name'];
+                $user_id = $_POST['user_id'];
                 // Update the status to 'rejected'
                 $rejectQuery = "UPDATE pending_product SET status='rejected' WHERE p_id='$pid'";
                 mysqli_query($conn, $rejectQuery);
             
-                $_SESSION['prod_req_denied'] = "Your request for buying $productName was denied by the admin.";
+                $message = "Your request for buying $productName was denied by the admin.";
+                $insertNotification = "INSERT INTO notifications (user_id, message,section) VALUES ('$user_id', '$message','prod_eqp')";
+                mysqli_query($conn, $insertNotification);
                 echo "The request was rejected.";
                 header("Location: " . $_SERVER['PHP_SELF']);
                 exit();
@@ -126,38 +135,56 @@ require 'connection.php';
     <button class="reject-button" name="reject_instructor" type="submit">Reject</button> 
     <input type="hidden" name="req_userid" value="<?= htmlspecialchars($req_userid); ?>">
     <input type="hidden" name="instr_id" value="<?= htmlspecialchars($i_id); ?>">
+    <input type="hidden" name="instr_name" value="<?= htmlspecialchars($instructorName); ?>">
 </form>
+
                     <?php
                 }
             } 
 
             if (isset($_POST['approve_instructor'])) {
                 $userid = $_POST['req_userid'];
-                $instructor_id= $_POST['instr_id'];
-                // Update the pending_product status
+                $instructor_id = $_POST['instr_id'];
+                $instructorName = $_POST['instr_name']; // Correct instructor name
+            
+                // Update instructor request status
                 $updateInstructor = "UPDATE instructor_request SET status='complete', approved_date=NOW() WHERE user_id='$userid'";
                 mysqli_query($conn, $updateInstructor);
-
-                // Update the product quantity
-                $updateUserInstructor = "UPDATE users_info SET instructor_id ='$instructor_id'  WHERE id='$userid'";
-                mysqli_query($conn, $updateUserInstructor);
-                $_SESSION['instructor_req_approved']="Your request for the instructor was approved.";
-
-                echo "Request approved for the instructor and updated.";
-                header("Location: ".$_SERVER['PHP_SELF']); 
-                exit();
-            } 
-            if (isset($_POST['reject_instructor'])) {
-                $instructor_id= $_POST['instr_id'];
-                // Update the status to 'rejected'
-                $rejectInstrQuery = "UPDATE instructor_request SET status='rejected' WHERE instructor_id=' $instructor_id'";
-                mysqli_query($conn, $rejectInstrQuery);
             
-                $_SESSION['instructor_req_denied'] = "Your request for the instructor was denied by the admin.";
-                echo "The request was rejected.";
-                header("Location: " . $_SERVER['PHP_SELF']);
+                // Assign instructor to user
+                $updateUserInstructor = "UPDATE users_info SET instructor_id='$instructor_id' WHERE id='$userid'";
+                mysqli_query($conn, $updateUserInstructor);
+            
+                // Insert notification with correct instructor name
+                $message = "Your request for instructor $instructorName was approved.";
+                $insertNotification = "INSERT INTO notifications (user_id, message,section) VALUES ('$userid', '$message','instructor')";
+                mysqli_query($conn, $insertNotification);
+            
+                echo "Request approved.";
+                header("Location: ".$_SERVER['PHP_SELF']);
                 exit();
             }
+            
+            
+            if (isset($_POST['reject_instructor'])) {
+                $userid = $_POST['req_userid'];
+                $instructor_id = $_POST['instr_id'];
+                $instructorName = $_POST['instr_name']; // Correct instructor name
+            
+                // Update request status
+                $rejectInstrQuery = "UPDATE instructor_request SET status='rejected' WHERE user_id='$userid'";
+                mysqli_query($conn, $rejectInstrQuery);
+            
+                // Insert rejection notification with correct instructor name
+                $message = "Your request for instructor $instructorName was denied by the admin.";
+                $insertNotification = "INSERT INTO notifications (user_id, message,section) VALUES ('$userid', '$message','instructor')";
+                mysqli_query($conn, $insertNotification);
+            
+                echo "Request rejected.";
+                header("Location: ".$_SERVER['PHP_SELF']);
+                exit();
+            }
+            
             ?>
   
   <!-- for membership -->
@@ -177,6 +204,7 @@ if(mysqli_num_rows($result_membreq) > 0) {
         $req_membType = $row['requested_membership_type'];
         $req_userid = $row['req_userid'];
         $username = $row['username'];
+        $req_id=$row['_id'];
         ?>
 
         <form action="" method="post">
@@ -195,6 +223,8 @@ if(mysqli_num_rows($result_membreq) > 0) {
             <input type="hidden" name="req_userid" value="<?= htmlspecialchars($req_userid); ?>">
             <input type="hidden" name="membreq_type" value="<?= htmlspecialchars($req_type); ?>">
             <input type="hidden" name="memb_type" value="<?= htmlspecialchars($req_membType); ?>">
+            <input type="hidden" name="req_id" value="<?= htmlspecialchars($req_id); ?>">
+      
         </form>
 
         <?php
@@ -204,13 +234,15 @@ if(mysqli_num_rows($result_membreq) > 0) {
 // Handle Renewal Approval
 if (isset($_POST['approve_renewal'])) {
     $userid = $_POST['req_userid'];
+    $reqid=$_POST['req_id'];
     $updateMembInfo = "UPDATE users_info SET membership_expiry_date = DATE_ADD(NOW(), INTERVAL 1 YEAR) WHERE id = '$userid'";
     mysqli_query($conn, $updateMembInfo);
 
-    $updateMembreq = "UPDATE membership_requests SET status='complete' WHERE req_userid='$userid' AND request_type='renewal'";
+    $updateMembreq = "UPDATE membership_requests SET status='complete' WHERE _id='$reqid' AND request_type='renewal'";
     mysqli_query($conn, $updateMembreq);
-
-    $_SESSION['memb_req_approved'] = "Membership renewal approved.";
+    $message = "Your membership renewal request has been approved. Your new expiry date is updated.";
+    $insertNotification = "INSERT INTO notifications (user_id, message, section) VALUES ('$userid', '$message','membership')";
+    mysqli_query($conn, $insertNotification);
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
@@ -219,14 +251,18 @@ if (isset($_POST['approve_renewal'])) {
 if (isset($_POST['approve_upgrade'])) {
     $userid = $_POST['req_userid'];
     $newType = $_POST['memb_type'];
+    $reqid=$_POST['req_id'];
 
     $updateMembInfo = "UPDATE users_info SET membership='$newType' WHERE id='$userid'";
     mysqli_query($conn, $updateMembInfo);
 
-    $updateMembreq = "UPDATE membership_requests SET status='complete' WHERE req_userid='$userid' AND request_type='upgrade'";
+    $updateMembreq = "UPDATE membership_requests SET status='complete' WHERE _id='$reqid' AND request_type='upgrade'";
     mysqli_query($conn, $updateMembreq);
 
-    $_SESSION['memb_req_approved'] = "Membership upgrade approved.";
+    $message = "Your membership upgrade request has been approved. You are now a $newType member.";
+    $insertNotification = "INSERT INTO notifications (user_id, message, section) VALUES ('$userid', '$message','membership')";
+    mysqli_query($conn, $insertNotification);
+
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
@@ -234,8 +270,12 @@ if (isset($_POST['approve_upgrade'])) {
 // Handle Upgrade Rejection
 if (isset($_POST['reject_upgrade'])) {
     $userid = $_POST['req_userid'];
-    $updateRequest = "UPDATE membership_requests SET status='rejected' WHERE req_userid='$userid' AND request_type='upgrade'";
-    $_SESSION['memb_req_denied'] = "Membership upgrade denied.";
+    $reqid=$_POST['req_id'];
+    $updateRequest = "UPDATE membership_requests SET status='rejected' WHERE _id='$reqid' AND request_type='upgrade'";
+
+    $message = "Your membership upgrade request has been denied.";
+    $insertNotification = "INSERT INTO notifications (user_id, message, section) VALUES ('$userid', '$message','membership')";
+    mysqli_query($conn, $insertNotification);
    
     mysqli_query($conn, $updateRequest);
     header("Location: " . $_SERVER['PHP_SELF']);
@@ -245,9 +285,13 @@ if (isset($_POST['reject_upgrade'])) {
 // Handle Renewal Rejection
 if (isset($_POST['reject_renewal'])) {
     $userid = $_POST['req_userid'];
-    $updateRequest = "UPDATE membership_requests SET status='rejected' WHERE req_userid='$userid' AND request_type='renewal'";
+    $reqid=$_POST['req_id'];
+    $updateRequest = "UPDATE membership_requests SET status='rejected' WHERE _id='$reqid' AND request_type='renewal'";
     mysqli_query($conn, $updateRequest);
-    $_SESSION['memb_req_denied'] = "Membership renewal denied.";
+
+    $message = "Your membership renewal request has been denied."; 
+    $insertNotification = "INSERT INTO notifications (user_id, message, section) VALUES ('$userid', '$message','membership')";
+    mysqli_query($conn, $insertNotification);
    
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
@@ -272,6 +316,8 @@ if (isset($_POST['reject_renewal'])) {
                     $eid=$row['e_id'];
                     $requestedQty = $row['requested_qty'];
                     $username = $row['username'];
+                    $req_id=$row['id'];
+                    $req_userid=$row['req_userid'];
                     ?>
                    <form action="" method="post">
     <p><strong>Requested user:</strong> <?= htmlspecialchars($username); ?></p>
@@ -282,6 +328,9 @@ if (isset($_POST['reject_renewal'])) {
     <input type="hidden" name="equipment_name" value="<?= htmlspecialchars($equipmentName); ?>">
     <input type="hidden" name="requested_qty" value="<?= htmlspecialchars($requestedQty); ?>">
     <input type="hidden" name="e_id" value="<?= htmlspecialchars($eid); ?>">
+    <input type="hidden" name="req_id" value="<?= htmlspecialchars($req_id); ?>">
+    
+    <input type="hidden" name="req_uid" value="<?= htmlspecialchars($req_userid); ?>">
 </form>
                     <?php
                 }
@@ -291,14 +340,19 @@ if (isset($_POST['reject_renewal'])) {
                 $EquipmentName = $_POST['equipment_name'];
                 $requestedQty = $_POST['requested_qty'];
                 $eid=$_POST['e_id'];
+                $reqid=$_POST['req_id'];
+                $userid=$_POST['req_uid'];
                 // Update the pending_product status
-                $updatePendingEqp = "UPDATE pending_equipment SET status='complete', approved_date=NOW() WHERE e_id='$eid'";
+                $updatePendingEqp = "UPDATE pending_equipment SET status='complete', approved_date=NOW() WHERE id='$eid'";
                 mysqli_query($conn, $updatePendingEqp);
 
                 // Update the product quantity
                 $updateEquipment = "UPDATE equipment SET available_quantity = available_quantity - $requestedQty WHERE name='$EquipmentName'";
                 mysqli_query($conn, $updateEquipment);
-                $_SESSION['eqp_req_approved']="Your request for buying $EquipmentName was approved. The product will be delivered soon";
+
+                $message = "Your request for buying $EquipmentName has been approved by admin. The equipment will be delivered soon"; 
+                $insertNotification = "INSERT INTO notifications (user_id, message, section) VALUES ('$userid', '$message','prod_equip')";
+                mysqli_query($conn, $insertNotification);
 
                 echo "Request approved and quantity updated.";
                 header("Location: ".$_SERVER['PHP_SELF']); 
@@ -307,19 +361,111 @@ if (isset($_POST['reject_renewal'])) {
             if (isset($_POST['reject_eqp'])) {
                 $eid = $_POST['e_id'];
                 $EquipmentName = $_POST['equipment_name'];
-                
+                $userid=$_POST['req_uid'];
                 // Update the status to 'rejected'
                 $rejectEqpQuery = "UPDATE pending_equipment SET status='rejected' WHERE e_id='$eid'";
                 mysqli_query($conn, $rejectEqpQuery);
-            
-                $_SESSION['eqp_req_denied'] = "Your request for buying $EquipmentName was denied by the admin.";
+                
+                $message = "Your request for buying $EquipmentName was denied by the admin"; 
+                $insertNotification = "INSERT INTO notifications (user_id, message, section) VALUES ('$userid', '$message','prod_equip')";
+                mysqli_query($conn, $insertNotification);
+
                 echo "The request was rejected.";
                 header("Location: " . $_SERVER['PHP_SELF']);
                 exit();
             }
             ?>
 
-<!-- for rental equipment -->
+            <!-- For rental equipment -->
+            <?php
+            // Fetch pending requests
+            $reqpsql = "SELECT re.*, u.username, eqp.name 
+            FROM pending_rental re
+            INNER JOIN users_login u ON re.user_id = u.id
+            INNER JOIN rental_equipments req ON re.e_id = req.equipment_id
+            INNER JOIN equipment eqp ON req.equipment_id = eqp.equipment_id
+            WHERE re.status = 'pending'";
+        
+
+            $reresult = mysqli_query($conn, $reqpsql);
+
+            if(mysqli_num_rows($reresult) > 0) {
+                while ($row = mysqli_fetch_assoc($reresult)) {
+                    $equipmentName = $row['name'];
+                    $eid=$row['e_id'];
+                    $requestedQty = $row['requested_qty'];
+                    $username = $row['username'];
+                    $rid=$row['r_id'];
+                    $req_userid=$row['user_id'];
+                    ?>
+                   <form action="" method="post">
+    <p><strong>Requested user:</strong> <?= htmlspecialchars($username); ?></p>
+    <p><strong>Rental Equipment:</strong> <?= htmlspecialchars($equipmentName); ?></p>
+    <p><strong>Requested Date:</strong> <?= htmlspecialchars($row['requested_date']); ?></p>
+    <button class="approve-button" name="approve_reqp" type="submit">Approve</button>
+    <button class="reject-button" name="reject_reqp" type="submit">Reject</button> 
+    <input type="hidden" name="requipment_name" value="<?= htmlspecialchars($equipmentName); ?>">
+    <input type="hidden" name="requested_qty" value="<?= htmlspecialchars($requestedQty); ?>">
+    <input type="hidden" name="re_id" value="<?= htmlspecialchars($eid); ?>">  
+    <input type="hidden" name="r_id" value="<?= htmlspecialchars($rid); ?>"> 
+    <input type="hidden" name="req_uid" value="<?= htmlspecialchars($req_userid); ?>">
+</form>
+                    <?php
+                }
+            } 
+
+            if (isset($_POST['approve_reqp'])) {
+                $EquipmentName = $_POST['requipment_name'];
+                $requestedQty = $_POST['requested_qty'];
+                $eid=$_POST['re_id'];
+                $rid=$_POST['r_id'];
+                $userid=$_POST['req_uid'];
+                // Update the pending_product status
+                $updatePendingREqp = "UPDATE pending_rental SET status='complete', approved_date=NOW() WHERE r_id='$rid'";
+                mysqli_query($conn, $updatePendingREqp);
+
+                
+                // Update the product quantity
+                $updateREquipment = "UPDATE rental_equipments re
+                     JOIN pending_rental pr ON re.equipment_id = pr.e_id
+                     SET re.available_rental_qty = re.available_rental_qty - $requestedQty
+                     WHERE pr.r_id = $rid";
+                    mysqli_query($conn, $updateREquipment);
+                // $_SESSION['eqp_req_approved']="Your request for buying $EquipmentName was approved. The product will be delivered soon";
+
+                $message = "Your request for renting $EquipmentName was approved by the admin. The equipment will be delivered soon."; 
+                $insertNotification = "INSERT INTO notifications (user_id, message, section) VALUES ('$userid', '$message','rental')";
+               
+                mysqli_query($conn, $insertNotification);
+
+                echo "Request approved and quantity updated.";
+                header("Location: ".$_SERVER['PHP_SELF']); 
+                exit();
+            } 
+            if (isset($_POST['reject_reqp'])) {
+                $eid = $_POST['e_id'];
+                $EquipmentName = $_POST['equipment_name'];
+                $rid=$_POST['r_id'];
+                
+                $req_userid=$_POST['req_uid'];
+                
+                // Update the status to 'rejected'
+                $rejectEqpQuery = "UPDATE pending_rental SET status='rejected' WHERE r_id='$rid'";
+                mysqli_query($conn, $rejectEqpQuery);
+            
+                
+                $message = "Your request for renting $EquipmentName was denied by the admin."; 
+                $insertNotification = "INSERT INTO notifications (user_id, message, section) VALUES ('$req_userid', '$message','rental')";
+                mysqli_query($conn, $insertNotification);
+
+                echo "The request was rejected.";
+                header("Location: " . $_SERVER['PHP_SELF']);
+                exit();
+            }
+            ?>
+
+
+<!-- for rental return equipment -->
 <?php
 $reteqpsql = "SELECT rer.*, u.username, eq.name, r.available_rental_qty 
            FROM pending_rental_return rer
@@ -335,6 +481,8 @@ if(mysqli_num_rows($retEqpresult) > 0) {
         $equipmentName = $row['name'];
         $eid = $row['e_id'];
         $username = $row['username'];
+        $rrid=$row['id'];
+        $user_id=$row['user_id'];
         ?>
         <form action="" method="post">
             <p><strong>Requested user:</strong> <?= htmlspecialchars($username); ?></p>
@@ -344,6 +492,8 @@ if(mysqli_num_rows($retEqpresult) > 0) {
             <button class="reject-button" name="reject_reteqp" type="submit">Reject</button> 
             <input type="hidden" name="retequipment_name" value="<?= htmlspecialchars($equipmentName); ?>">
             <input type="hidden" name="rete_id" value="<?= htmlspecialchars($eid); ?>">
+            <input type="hidden" name="rr_id" value="<?= htmlspecialchars($rrid); ?>">
+            <input type="hidden" name="user_id" value="<?= htmlspecialchars($user_id); ?>">
             <input type="hidden" name="available_qty" value="<?= htmlspecialchars($row['available_rental_qty']); ?>">
         </form>
         <?php
@@ -354,16 +504,22 @@ if(mysqli_num_rows($retEqpresult) > 0) {
 if (isset($_POST['approve_reteqp'])) {
     $EquipmentName = $_POST['retequipment_name'];
     $reteid = $_POST['rete_id'];
-
+    $rid=$_POST['rr_id'];
+    $userid=$_POST['user_id'];
     // Update pending rental return status
-    $updatePendingRetEqp = "UPDATE pending_rental_return SET status='complete', approved_return_date=NOW() WHERE e_id= '$reteid' ";
+    $updatePendingRetEqp = "UPDATE pending_rental_return SET status='complete', approved_return_date=NOW() WHERE id= '$rid' ";
     mysqli_query($conn, $updatePendingRetEqp);
 
+    
+    $update_rental_transaction="UPDATE rental_transactions SET is_returned=1 where rental_id='$reteid' and user_id='$userid'";
+    mysqli_query($conn,$update_rental_transaction);
     // Increase quantity
     $updateRetEquipment = "UPDATE rental_equipments SET available_rental_qty = available_rental_qty + 1 WHERE equipment_id='$reteid'";
     mysqli_query($conn, $updateRetEquipment);
 
-    $_SESSION['retE_req_approved'] = "Your request for returning $EquipmentName was approved. The product will be delivered soon";
+    $message = "Your request for returning $EquipmentName was approved by the admin."; 
+    $insertNotification = "INSERT INTO notifications (user_id, message, section) VALUES ('$userid', '$message','return_rental')";
+    mysqli_query($conn, $insertNotification);
 
     echo "Request approved and quantity updated.";
     header("Location: " . $_SERVER['PHP_SELF']);
@@ -376,10 +532,12 @@ if (isset($_POST['reject_reteqp'])) {
     $EquipmentName = $_POST['retequipment_name'];
 
     // Update status to 'rejected'
-    $rejectRetEqpQuery = "UPDATE pending_rental_return SET status='rejected' WHERE e_id= '$reteid' ";
+    $rejectRetEqpQuery = "UPDATE pending_rental_return SET status='rejected' WHERE id= '$rid' ";
     mysqli_query($conn, $rejectRetEqpQuery);
 
-    $_SESSION['retE_req_denied'] = "Your request for returning $EquipmentName was denied by the admin.";
+    $message = "Your request for returning $EquipmentName was approved by the admin."; 
+    $insertNotification = "INSERT INTO notifications (user_id, message, section) VALUES ('$userid', '$message','return_rental')";
+    mysqli_query($conn, $insertNotification);
     
     echo "The request was rejected.";
     header("Location: " . $_SERVER['PHP_SELF']);
@@ -439,7 +597,9 @@ if (isset($_POST['approve_payment'])) {
                        WHERE id = '$userid'";
     mysqli_query($conn, $updatePayment);
 
-    $_SESSION['payment_success'] = "Payment approved! Next due date: " . date('Y-m-d', strtotime($requested_date . ' +1 month'));
+    $message = "Payment approved! Next due date: " . date('Y-m-d', strtotime($requested_date . ' +1 month')); 
+    $insertNotification = "INSERT INTO notifications (user_id, message, section) VALUES ('$userid', '$message','payment')";
+    mysqli_query($conn, $insertNotification);
 
     echo "Payment approved. Due date updated.";
     header("Location: " . $_SERVER['PHP_SELF']);
@@ -456,6 +616,10 @@ if (isset($_POST['reject_payment'])) {
 
     $_SESSION['payment_error'] = "Payment request was rejected.";
     
+    $message = "Your request for payment was rejected."; 
+    $insertNotification = "INSERT INTO notifications (user_id, message, section) VALUES ('$userid', '$message','payment')";
+    mysqli_query($conn, $insertNotification);
+
     echo "The request was rejected.";
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();

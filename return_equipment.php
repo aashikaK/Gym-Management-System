@@ -31,11 +31,9 @@ if ($row['return_count'] > 0) {
 } else {
     // Check if the equipment is rented and not already returned
     $rented_check_sql = "SELECT COUNT(*) AS rented_count 
-                         FROM rental_transactions rt 
-                         JOIN rental_equipments re ON rt.rental_id = re.rental_id 
-                         WHERE re.equipment_id = ? AND rt.is_returned = 0";
+                         FROM rental_transactions WHERE user_id='$user_id' AND rental_id='$equipment_id' AND is_returned = 0";
     $stmt = $conn->prepare($rented_check_sql);
-    $stmt->bind_param("i", $equipment_id);
+   
     $stmt->execute();
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
@@ -52,7 +50,7 @@ if ($row['return_count'] > 0) {
         $stmt->execute();
     } else {
         echo "<h2>This product has not been rented yet.</h2>";
-        echo '<a href="equipment_page.php">Go Back</a>'; 
+        echo '<a href="rent_buy_equipment.php">Go Back</a>'; 
     }
 }
 

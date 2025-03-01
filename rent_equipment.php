@@ -44,12 +44,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $requested_date = date('Y-m-d H:i:s');
         $rent_approv_sql = "INSERT INTO pending_rental(e_id, user_id,requested_qty, requested_date, status, approved_date) VALUES ('$equipment_id', '{$_SESSION['id']}','$quantity', '$requested_date', 'pending', NULL);";
         // Insert rental transaction into `rental_transactions`
-        // $insert_rental_sql = "
-        //     INSERT INTO rental_transactions (rental_id, user_id, rental_date, due_date, is_returned) 
-        //     VALUES ('$equipment_id', '{$_SESSION['id']}', '$rental_start_date', '$rental_end_date', 0)";
+        $insert_rental_sql = "
+            INSERT INTO rental_transactions (rental_id, user_id, rental_date, due_date, is_returned) 
+            VALUES ('$equipment_id', '{$_SESSION['id']}', '$rental_start_date', '$rental_end_date', 0)";
         
         $update_result = mysqli_query($conn, $rent_approv_sql);
-        // $insert_result = mysqli_query($conn, $insert_rental_sql);
+        $insert_result = mysqli_query($conn, $insert_rental_sql);
 
         if ($update_result ) {
             $success_message = "Rental request is submitted for approval!<br>

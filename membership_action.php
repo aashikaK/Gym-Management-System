@@ -46,7 +46,7 @@ if ($action === 'renew' && $allow_renewal) {
 
 if ($action === 'upgrade') {
     // Check if an upgrade request already exists for this user
-    $check_upgrade_sql = "SELECT req_userid, request_type FROM membership_requests WHERE req_userid = ? AND request_type = 'upgrade'";
+    $check_upgrade_sql = "SELECT req_userid, request_type FROM membership_requests WHERE req_userid = ? AND request_type = 'upgrade' and status='pending'";
     $stmt = $conn->prepare($check_upgrade_sql);
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
@@ -61,14 +61,14 @@ if ($action === 'upgrade') {
         exit;
     }
 
-    // If no upgrade request exists, display the upgrade form
-    echo "<h2> Choose Your New Membership Plan</h2>";
-    echo "<form method='post' action='process_upgrade.php'>";
-    echo "<input type='radio' name='membership' value='Silver' required> Silver<br>";
-    echo "<input type='radio' name='membership' value='Gold'> Gold<br>";
-    echo "<input type='radio' name='membership' value='Platinum'> Platinum<br>";
-    echo "<button type='submit'>Confirm Upgrade</button>";
-    echo "</form>";
+        // If no upgrade request exists, display the upgrade form
+        echo "<h2> Choose Your New Membership Plan</h2>";
+        echo "<form method='post' action='process_upgrade.php'>"; 
+        echo "<input type='radio' name='membership' value='Gold'> Gold<br>";
+        echo "<input type='radio' name='membership' value='Silver' required> Silver<br>";
+        echo "<input type='radio' name='membership' value='Platinum'> Platinum<br>";
+        echo "<button type='submit'>Confirm Upgrade</button>";
+        echo "</form>";
 }
 else {
     echo "<p>Renewal is allowed only within 30 days of expiry.</p>";
