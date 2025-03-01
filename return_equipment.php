@@ -32,10 +32,10 @@ if ($row['return_count'] > 0) {
     // Check if the equipment is rented and not already returned
     $rented_check_sql = "SELECT COUNT(*) AS rented_count 
                          FROM rental_transactions WHERE user_id='$user_id' AND rental_id='$equipment_id' AND is_returned = 0";
-    $stmt = $conn->prepare($rented_check_sql);
+    $rentstmt = $conn->prepare($rented_check_sql);
    
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $rentstmt->execute();
+    $result = $rentstmt->get_result();
     $row = $result->fetch_assoc();
 
     if ($row['rented_count'] > 0) {

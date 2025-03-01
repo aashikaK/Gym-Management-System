@@ -34,8 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $rent_equip_result = mysqli_query($conn, $rent_equip_query);
     $rental_equipment = mysqli_fetch_assoc($rent_equip_result);
 
-    if ($quantity > $rental_equipment['available_rental_qty']) {
-        $error_message = "Sorry, insufficient stock available.";
+     if ($rental_equipment['available_rental_qty']==0) {
+        $error_message="Sorry, equipment is currently not available for rent";
+     }
+        if ($quantity > 1) {
+        $error_message = "Sorry, you cannot rent more than 1 of particular equipment.";
     } else {
         // $new_quantity = $rental_equipment['available_rental_qty'] - $quantity;
 
@@ -105,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <input type="text" id="rent_price" value="Rs <?php echo number_format($equipment['rent_price_per_month'], 2); ?>" readonly>
 
             <label for="quantity">Quantity:</label>
-            <input type="number" id="quantity" name="quantity" min="1" max="<?php echo $equipment['available_quantity']; ?>" value="1">
+            <input type="number" id="quantity" name="quantity" min="1" max="1" value="1">
 
             <label for="start_date">Rental Start Date:</label>
             <input type="date" id="start_date" name="start_date" required>
