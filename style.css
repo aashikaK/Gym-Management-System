@@ -530,3 +530,29 @@ margin:20px 0px 20px;
     width: 950px;
     margin-left: 100pxs;
 }
+.suggestions-box {
+    position: absolute;
+    background: rgba(30, 30, 30, 0.95); /*  Dark background with slight transparency */
+    border: 1px solid #444; /* Subtle border */
+    max-height: 250px;
+    overflow-y: auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6); /* Glowing shadow effect */
+    display: none;
+    width: 100%; /* Matches search box width */
+    z-index: 1000;
+    border-radius: 8px; /*  Smooth rounded corners */
+    padding: 5px;
+}
+
+.suggestion-item {
+    padding: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    color: white; /* White text for contrast */
+    border-bottom: 1px solid #555; /* Subtle separator */
+    transition: background 0.2s ease-in-out;
+}
+
+.suggestion-item:hover {
+    background: rgba(100, 100, 100, 0.3); /*  Lighter hover effect */
+}

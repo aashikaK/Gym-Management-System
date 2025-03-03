@@ -30,12 +30,13 @@
 </div>
 
 <div class="right">
-    <form class="search" method="post">
-      
-        <input type="search" name="query" placeholder="Search..." aria-label="Search">
+    <form class="search" method="post" onsubmit="return handleSearch(event)" style="position: relative;">
+        <input type="search" id="searchbox" placeholder="Search..." aria-label="Search">
         <button type="submit">
-            <i class="fa fa-search" aria-hidden="true"></i> <!-- Search icon inside the button -->
-        </button> <br>
+            <i class="fa fa-search" aria-hidden="true"></i> <!-- Search icon -->
+        </button>
+        <div id="suggestions-box" class="suggestions-box"></div>  
+    </form>
        </div>
  </section>
 
@@ -79,5 +80,6 @@
     <footer class="contact-footer">
         <p>&copy; 2024 ShapeShifter Fitness and Gym. All Rights Reserved.</p>
     </footer>
+    <script src="search.js"></script>
 </body>
 </html>
