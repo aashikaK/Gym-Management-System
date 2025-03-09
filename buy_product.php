@@ -37,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $insert_sql = "INSERT INTO pending_product (p_id, req_userid,requested_qty, requested_date, status) 
                        VALUES ($product_id, $user_id, $quantity,'$requested_date', 'pending')";
 
+        
         if (mysqli_query($conn, $insert_sql)) {
             // Show pending approval message
             $success_message = "Thank you for your purchase request!<br>";
@@ -44,10 +45,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $success_message .= "Total Price: Rs " . ($product['discounted_amt'] * $quantity) . "<br>";
             $success_message .= "Delivery Location: {$location}<br>";
             $success_message .= "Bank Account: {$bank_account}<br>";
-            $success_message .= "Your order will be delivered after admin approval.";
+            $success_message .= "Your order will be delivered after processing approval.";
         } else {
             $error_message = "There was an error processing your purchase request. Please try again.";
         }
+        $pay_sql = "INSERT INTO product_payment (user_id,p_id, amount, status) 
+        VALUES ('$user_id','$product_id','".($product['discounted_amt'] * $quantity)."', 'pending')";
+
+        mysqli_query($conn, $pay_sql);
     }
 }
 ?>
@@ -174,7 +179,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <input type="text" id="location" name="location" required>
 
             <label for="bank_account">Bank Account Number:</label>
-            <input type="text" id="bank_account" name="bank_account" required>
+            <input type="text" id="bank_account" name="bank_account" required pattern="^(?=.*\d)[A-Za-z0-9]+$" 
+            title="Bank account number must contain at least one number and may include letters, but cannot be only letters.">
 
             <div class="total-price" id="total_price">Total: Rs <?php echo number_format($product['discounted_amt'], 2); ?></div>
 

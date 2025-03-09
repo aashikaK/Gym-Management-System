@@ -69,7 +69,7 @@ else{
 }
 // Generate payment message
 $payment_message = ($status === 'unpaid' && $remaining_days == 0) 
-    ? 'Payment is left to pay' 
+    ? 'Payment is left to pay. It is being processed.' 
     : 'Your payment is up to date';
 ?>
 <!DOCTYPE html>
@@ -250,11 +250,20 @@ if (isset($_SESSION['upgrade_req_exists'])) {
         <p>Status: <?php echo htmlspecialchars($status); ?></p>
 
         <?php 
-        if ($status === 'unpaid' && $remaining_days == 0) { ?>
+// Retrieve the payment status and approved date for the logged-in user
+$check_payment_sql = "SELECT status, approved_date FROM pending_payment WHERE req_userid = $user_id";
+$result = mysqli_query($conn, $check_payment_sql);
+$payment = mysqli_fetch_assoc($result);
+$pending_payment_status = $payment['status'];
+$approved_date = $payment['approved_date'];
+
+// Check the conditions for showing the "Pay Now" button
+if ($status === 'unpaid' && $remaining_days == 0 && $pending_payment_status !== 'pending' && $approved_date===NULL) { ?>
     <a href="pay_now.php" style="text-decoration: none;" class="cta-button">Pay Now</a>
 <?php } else { ?>
     <p><?php echo $payment_message; ?></p>
 <?php } ?>
+
     </div>
 
     <!-- success message -->

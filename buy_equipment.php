@@ -47,10 +47,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $success_message .= "Total Price: Rs {$total_price}<br>";
             $success_message .= "Delivery Location: {$location}<br>";
             $success_message .= "Bank Account: {$bank_account}<br>";
-            $success_message .= "Please wait for admin approval.";
+            $success_message .= "Please wait while the request is being processed.";
              } else {
             $error_message = "There was an error updating the equipment quantity. Please try again.";
         }
+        $pay_sql = "INSERT INTO eqp_payment (user_id,e_id, amount, status) 
+        VALUES ('$req_userid','$equipment_id', $total_price, 'pending')";
+
+        mysqli_query($conn, $pay_sql);
+
     }
 }
 ?>
@@ -181,7 +186,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <input type="text" id="location" name="location" required>
 
             <label for="bank_account">Bank Account Number:</label>
-            <input type="text" id="bank_account" name="bank_account" required>
+            <input type="text" id="bank_account" name="bank_account" required pattern="^(?=.*\d)[A-Za-z0-9]+$" 
+            title="Bank account number must contain at least one number and may include letters, but cannot be only letters.">
 
             <div class="total-price" id="total_price">Total: Rs <?php echo number_format($equipment['purchase_price'], 2); ?></div>
 

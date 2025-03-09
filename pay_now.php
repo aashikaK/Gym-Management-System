@@ -57,21 +57,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $account_number = $_POST['account_number'];
     $payment_status = "Pending";
 
+    // Ensure $payment_due is properly initialized
+    $amount_paid = isset($payment_due) ? $payment_due : 0; // Default to 0 if null
+
     // Insert payment request into the pending_payment table
     $req_userid = $_SESSION['id'];
     $requested_date = date('Y-m-d H:i:s');
-    $admin_approv_sql = "INSERT INTO pending_payment (req_userid,amount_paid, requested_date, status, approved_date) 
-                          VALUES (?,?, ?, ?, NULL)";
+
+    $admin_approv_sql = "INSERT INTO pending_payment (req_userid, amount_paid, requested_date, status, approved_date) 
+                          VALUES ('$req_userid','$amount_paid' ,'$requested_date' ,'$payment_status', NULL)";
     $stmt = $conn->prepare($admin_approv_sql);
-    $stmt->bind_param("iss", $req_userid,$amount_paid, $requested_date, $payment_status);
     $stmt->execute();
     $stmt->close();
 
+    // Fix SQL syntax error in pay_sql
+    $pay_sql= "INSERT INTO system_payment (user_id, amount, status) 
+               VALUES ($req_userid,$amount_paid, 'pending')";
+    mysqli_query($conn, $pay_sql);
+
     // Redirect back to dashboard with success message
-    $_SESSION['payment_success'] = "Request has been sent to admin for payment approval! Payment due date will be extended by 30 days after the approval.";
+    $_SESSION['payment_success'] = "Payment will be processed! Payment due date will be extended by 30 days after being processed.";
     header('Location: dashboard.php');
     exit;
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -90,9 +99,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <label for="amount">Amount Due (Rs):</label>
                 <input type="text" id="amount" name="amount" value="<?php echo number_format($payment_due, 2); ?>" readonly>
                 
-                <label for="account_number">Bank Account Number:</label>
-                <input type="text" id="account_number" name="account_number" required>
-                
+                <label for="bank_account">Bank Account Number:</label>
+<input type="text" id="account_number" name="account_number" required 
+       pattern="^(?=.*\d)[A-Za-z0-9]+$" 
+       title="Bank account number must contain at least one number and may include letters, but cannot be only letters.">
+
                 <button type="submit" class="cta-button">Submit Payment</button>
             </form>
         <?php else: ?>

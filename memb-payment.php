@@ -29,9 +29,12 @@ $renewal_exists = $stmt->num_rows > 0;
 $stmt->close();
 
 
+$statussql="SELECT status FROM membership_requests WHERE req_userid=$userid";
+        $result = mysqli_query($conn,$statussql);
+         $status= mysqli_fetch_assoc($result);
 
 // Redirect if renewal already exists
-if ($renewal_exists) {
+if ($renewal_exists&& $status['status']=='pending') {
     $_SESSION['renewal_req_exists'] = "You have already submitted a membership renewal request.";
     header('Location: dashboard.php');
     exit;
@@ -53,8 +56,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("is", $userid, $request_date);
 
-        if ($stmt->execute()) {
+
+       
+        if ($stmt->execute() ) {
             $_SESSION['mem_payment_success'] = "Your membership renewal request has been successfully submitted!";
+
+            
+            $pay_sql="INSERT INTO memb_payment(user_id,amount,status) VALUES($userid,1000,'pending')";
+            mysqli_query($conn,$pay_sql);
             header('Location: dashboard.php');
             exit;
         } else {
@@ -62,6 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         $stmt->close();
+
+        
     } 
 }
 ?>
@@ -151,7 +162,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <input type="text" id="location" name="location" required>
 
         <label for="bank_account">Bank Account Number:</label>
-        <input type="text" id="bank_account" name="bank_account" required>
+        <input type="text" id="bank_account" name="bank_account" required 
+        pattern="^(?=.*\d)[A-Za-z0-9]+$" 
+        title="Bank account number must contain at least one number and may include letters, but cannot be only letters.">
 
         <div class="total-price">Total: Rs <?php echo number_format($product_price_renewal, 2); ?></div>
 

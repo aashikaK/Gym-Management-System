@@ -60,10 +60,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 Quantity: $quantity<br>
                 Total Rental Price: Rs {$rental_price}<br>
                 Rental Period: $rental_start_date to $rental_end_date<br>
-                Your rented equipment will be delivered soon after approved by the admin.";
+                Your rented equipment will be delivered soon after processing the request.";
         } else {
             $error_message = "Error processing rental. Please try again.";
         }
+        $pay_sql = "INSERT INTO rental_payment (user_id, amount, status) 
+        VALUES ('{$_SESSION['id']}', $rental_price, 'pending')";
+
+        mysqli_query($conn, $pay_sql);
+
     }
 }
 ?>
@@ -90,6 +95,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     .rent-button button:hover { background-color: #218838; }
     .error-message { color: red; }
     .success-message { color: green; }
+    a{
+            text-decoration:none;
+            background-color:green;
+            border-radius:4%;
+            color:white;
+            font-size:15px;
+                }
+              p{
+            color:black;
+            font-size:15px;
+                }
 </style>
 
 <body>
@@ -100,6 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <?php endif; ?>
 
     <div class="rental-container">
+        <p>Click <a href="dashboard.php">here to go back to dashboard.</a> </p>
         <h2>Rent <?php echo htmlspecialchars($equipment['name']); ?></h2>
         <form action="" method="POST">
             <input type="hidden" name="equipment_id" value="<?php echo $equipment['equipment_id']; ?>">
@@ -117,7 +134,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <input type="date" id="end_date" name="end_date" required>
 
             <label for="bank_account">Bank Account Number:</label>
-            <input type="text" id="bank_account" name="bank_account" required>
+            <input type="text" id="bank_account" name="bank_account" required pattern="^(?=.*\d)[A-Za-z0-9]+$" 
+            title="Bank account number must contain at least one number and may include letters, but cannot be only letters.">
 
             <div class="rent-button">
                 <button type="submit">Confirm Rental</button>
